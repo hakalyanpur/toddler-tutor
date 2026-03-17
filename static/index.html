@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avyaan's Tutor</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #6366f1; --accent-l: #eef2ff; --accent-m: #a5b4fc;
+    --green:  #10b981; --orange: #f59e0b; --pink: #ec4899;
+    --bg: #f8fafc;
+    --card-bg: #ffffff; --text: #1e293b; --text-sub: #64748b;
+    --table-border: #e2e8f0; --input-bg: #f1f5f9;
+    --purple: var(--accent); --purple-l: var(--accent-l); --purple-m: var(--accent-m);
+  }
+  [data-theme="dark"] {
+    --accent: #818cf8; --accent-l: #1e1b4b; --accent-m: #4338ca;
+    --green: #34d399; --orange: #fbbf24; --pink: #f472b6;
+    --bg: #0f172a;
+    --card-bg: rgba(30,41,59,.92); --text: #f1f5f9; --text-sub: #94a3b8;
+    --table-border: #334155; --input-bg: #1e293b;
+    --purple: var(--accent); --purple-l: var(--accent-l); --purple-m: var(--accent-m);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg); min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 16px;
+  }
+  h1, h2, .display { font-family: 'Fredoka One', cursive; }
+
+  /* ── floating stars ── */
+  .star-bg { display: none; }
+
+  /* ── card ── */
+  .card {
+    position: relative; z-index: 1;
+    background: var(--card-bg);
+    border-radius: 24px; padding: 40px 36px; max-width: 480px; width: 100%;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 8px 32px rgba(0,0,0,.06); border: 1px solid rgba(0,0,0,.06);
+    text-align: center; margin-top: 12px;
+  }
+  .mascot { display: none; }
+
+  /* ── buttons ── */
+  button { cursor: pointer; font-family: 'Fredoka One', cursive; border: none; transition: transform .1s, opacity .1s; }
+  button:active { transform: scale(.92); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+
+  .btn-primary {
+    background: var(--accent); color: #fff;
+    border-radius: 12px; padding: 14px 28px; font-size: 18px;
+    box-shadow: 0 2px 8px rgba(99,102,241,.25);
+    transition: transform .15s, box-shadow .15s, background .15s;
+  }
+  .btn-primary:hover { background: #4f46e5; box-shadow: 0 4px 16px rgba(99,102,241,.35); transform: translateY(-1px); }
+  .btn-mode {
+    border-radius: 16px; padding: 20px 22px; color: #fff;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    font-size: 16px; min-width: 110px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .btn-mode:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.14); }
+  .btn-mode .icon { font-size: 32px; }
+  .btn-math   { background: #6366f1; }
+  .btn-verbal { background: #10b981; }
+  .btn-chess  { background: #334155; }
+  .btn-board  { background: #f59e0b; color: #78350f; }
+
+  .btn-answer {
+    background: var(--accent-l); border: 1.5px solid var(--accent-m);
+    border-radius: 12px; padding: 14px 20px; font-size: 20px;
+    color: var(--accent); min-width: 90px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    transition: transform .12s, background .15s, color .15s, box-shadow .15s;
+  }
+  .btn-answer:hover:not(:disabled) { background: var(--accent); color: #fff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,.2); }
+
+  .btn-back {
+    position: fixed; top: 14px; left: 14px; z-index: 10;
+    background: var(--card-bg); border: 1px solid rgba(0,0,0,.08);
+    border-radius: 10px; padding: 8px 16px; color: var(--accent); font-size: 15px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  }
+  .btn-theme {
+    position: fixed; top: 14px; right: 14px; z-index: 10;
+    background: var(--card-bg); border: 1px solid rgba(0,0,0,.08);
+    border-radius: 10px; padding: 8px 14px; font-size: 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  }
+
+  /* ── quiz layout ── */
+  .emoji-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 16px 0; }
+  .big-emoji { font-size: 44px; animation: pop .3s ease both; }
+  @keyframes pop { from { transform: scale(0); opacity:0 } to { transform: scale(1); opacity:1 } }
+
+  .q-text { font-size: 22px; color: var(--text); margin: 8px 0 16px; }
+  .opt-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+  .pick-btn {
+    border: 3px solid var(--purple-m); border-radius: 20px; padding: 16px 24px;
+    background: var(--purple-l); cursor: pointer; display: flex;
+    flex-direction: column; align-items: center; gap: 8px;
+    font-family: 'Fredoka One', cursive;
+    box-shadow: 0 4px 16px rgba(109,40,217,.12);
+  }
+  .pick-btn .pick-num { font-size: 52px; color: var(--purple); line-height:1; }
+  .pick-btn:hover { background: #ddd6fe; }
+
+  /* ── feedback ── */
+  .feedback {
+    font-size: 24px; font-family: 'Fredoka One', cursive;
+    min-height: 40px; margin: 8px 0;
+    animation: pop .3s ease both;
+  }
+  .feedback.ok  { color: #10b981; }
+  .feedback.bad { color: #ef4444; }
+
+  /* ── hint box ── */
+  .hint-box {
+    background: #fffbeb; border: 1.5px solid #fcd34d; border-radius: 12px;
+    padding: 14px 20px; margin: 12px 0; font-size: 18px; color: #92400e;
+    font-family: 'Nunito', sans-serif; font-weight: 700;
+  }
+  .btn-retry {
+    background: #f59e0b; color: #fff;
+    border-radius: 10px; padding: 12px 24px; font-size: 16px;
+    margin-top: 10px; box-shadow: 0 2px 6px rgba(245,158,11,.2);
+  }
+  .btn-skip {
+    background: transparent; color: var(--text-sub);
+    border-radius: 10px; padding: 10px 20px; font-size: 14px;
+    margin-top: 14px; display: block; margin-left: auto; margin-right: auto;
+    border: 1px solid rgba(0,0,0,.08);
+  }
+  .btn-skip:hover { background: rgba(0,0,0,.04); }
+
+  /* ── more/less groups ── */
+  .group-row { display: flex; gap: 24px; justify-content: center; align-items: center; margin: 16px 0; }
+  .group-box {
+    background: var(--purple-l); border: 2.5px solid var(--purple-m);
+    border-radius: 16px; padding: 16px 20px; font-size: 36px;
+    cursor: pointer; min-width: 100px; text-align: center;
+    transition: transform .1s;
+  }
+  .group-box:hover { background: #ddd6fe; transform: scale(1.05); }
+
+  /* ── score bar ── */
+  .score-bar {
+    display: flex; gap: 20px; justify-content: center;
+    font-family: 'Fredoka One', cursive; font-size: 18px;
+    color: var(--accent); margin-bottom: 12px; position: relative; z-index: 1;
+    background: var(--card-bg); border-radius: 12px; padding: 8px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04); border: 1px solid rgba(0,0,0,.06);
+  }
+  .streak { color: var(--orange); }
+
+  /* ── progress / leaderboard ── */
+  .progress-block { background: var(--accent-l); border-radius: 12px; padding: 14px 18px; margin: 8px 0; text-align: left; }
+  .progress-block h3 { font-family: 'Fredoka One',cursive; color: var(--accent); font-size: 18px; margin-bottom: 6px; }
+  .bar-wrap { background: rgba(0,0,0,.06); border-radius: 20px; height: 12px; overflow: hidden; }
+  .bar-fill { background: var(--accent); height:100%; border-radius:20px; transition: width .6s ease; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--table-border); }
+  th { font-family: 'Fredoka One',cursive; color: var(--purple); font-size: 16px; }
+  td { font-size: 15px; color: var(--text); }
+  tr:last-child td { border-bottom: none; }
+
+  /* ── name input ── */
+  input[type=text] {
+    border: 1.5px solid rgba(0,0,0,.1); border-radius: 12px;
+    padding: 14px 18px; font-size: 18px; font-family: 'Nunito',sans-serif; font-weight: 700;
+    outline: none; background: var(--input-bg); color: var(--text); width: 100%; margin: 10px 0;
+    text-align: center; transition: border-color .2s, box-shadow .2s;
+  }
+  input[type=text]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,.12); }
+
+  /* ── confetti burst ── */
+  .confetti-wrap { pointer-events:none; position:fixed; inset:0; z-index:999; overflow:hidden; }
+  .conf { position:absolute; top:-20px; width:10px; height:10px; border-radius:2px;
+    animation: conffall 1.2s ease-in forwards; }
+  @keyframes conffall {
+    to { transform: translateY(110vh) rotate(720deg); opacity:0; }
+  }
+
+  /* ── chess board ── */
+  .chess-board {
+    display: grid; grid-template-columns: repeat(5,48px); grid-template-rows: repeat(5,48px);
+    gap: 0; margin: 16px auto; width: fit-content; border: 3px solid #ec4899;
+    border-radius: 8px; overflow: hidden; box-shadow: 0 4px 16px rgba(236,72,153,.25);
+  }
+  .chess-cell {
+    width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+    font-size: 28px; position: relative; transition: background .3s;
+  }
+  .chess-cell.light { background: #fff; }
+  .chess-cell.dark  { background: #fbcfe8; }
+  [data-theme="dark"] .chess-cell.light { background: #1e293b; }
+  [data-theme="dark"] .chess-cell.dark  { background: #0d9488; }
+  .chess-piece { font-size: 32px; z-index: 2; filter: drop-shadow(0 2px 3px rgba(0,0,0,.4)); }
+  .chess-highlight {
+    position: absolute; inset: 4px; border-radius: 50%;
+    background: rgba(132,204,22,.55); animation: chessPulse 1s ease-in-out infinite alternate;
+    box-shadow: 0 0 8px rgba(132,204,22,.5);
+  }
+  [data-theme="dark"] .chess-highlight {
+    background: rgba(250,204,21,.5);
+    box-shadow: 0 0 10px rgba(250,204,21,.5);
+  }
+  .chess-path {
+    position: absolute; inset: 4px; border-radius: 4px;
+    background: rgba(249,115,22,.45); animation: chessPulse 1s ease-in-out infinite alternate;
+  }
+  [data-theme="dark"] .chess-path {
+    background: rgba(251,191,36,.45);
+  }
+  @keyframes chessPulse {
+    from { opacity: .3; transform: scale(.85); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── chalkboard tutorial ── */
+  .chalkboard-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,.75); backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+  }
+  .chalkboard {
+    position: relative;
+    background:
+      /* chalk dust smudges */
+      radial-gradient(ellipse at 20% 30%, rgba(255,255,255,.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 60%, rgba(255,255,255,.025) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 80%, rgba(255,255,255,.02) 0%, transparent 40%),
+      /* base green board gradient */
+      linear-gradient(170deg, #1e4d35 0%, #1a3a2a 40%, #153022 100%);
+    border-radius: 12px;
+    max-width: 480px; width: 100%; padding: 32px 24px 22px;
+    box-shadow:
+      inset 0 0 60px rgba(0,0,0,.5),
+      inset 0 2px 0 rgba(255,255,255,.04),
+      0 8px 32px rgba(0,0,0,.5);
+    max-height: 90vh; overflow-y: auto;
+    /* wooden frame via layered borders + outline */
+    border: 6px solid #c49a6c;
+    outline: 4px solid #a07850;
+    outline-offset: 0px;
+  }
+  /* chalk tray at bottom */
+  .chalkboard::after {
+    content: ''; position: absolute; bottom: -14px; left: 10%; right: 10%;
+    height: 10px; background: linear-gradient(180deg, #b08860, #8a6840);
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 3px 6px rgba(0,0,0,.3);
+  }
+  /* grain/noise texture overlay */
+  .chalkboard::before {
+    content: ''; position: absolute; inset: 0; border-radius: 6px;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    opacity: .5; pointer-events: none; mix-blend-mode: overlay;
+  }
+  /* chalk dust particles */
+  @keyframes chalkDrift {
+    0%   { transform: translateY(0) translateX(0) scale(1); opacity: .5; }
+    100% { transform: translateY(-30px) translateX(10px) scale(0); opacity: 0; }
+  }
+  .chalk-dust {
+    position: absolute; width: 3px; height: 3px; border-radius: 50%;
+    background: rgba(255,255,255,.4); pointer-events: none;
+    animation: chalkDrift 2s ease-out forwards;
+  }
+  /* chalky text style */
+  .chalk-text {
+    color: rgba(255,255,255,.88);
+    text-shadow:
+      0 0 3px rgba(255,255,255,.15),
+      1px 0 0 rgba(255,255,255,.08),
+      -1px 0 0 rgba(255,255,255,.05),
+      0 1px 0 rgba(255,255,255,.06);
+    font-family: 'Fredoka One', cursive;
+    position: relative;
+  }
+  .chalk-yellow {
+    color: rgba(255,235,120,.9);
+    text-shadow:
+      0 0 4px rgba(255,235,120,.2),
+      1px 0 0 rgba(255,235,120,.1),
+      0 1px 0 rgba(255,235,120,.08);
+  }
+  .chalk-green {
+    color: rgba(130,255,170,.9);
+    text-shadow:
+      0 0 4px rgba(130,255,170,.2),
+      1px 0 0 rgba(130,255,170,.1);
+  }
+  .chalk-pink {
+    color: rgba(255,180,200,.9);
+    text-shadow:
+      0 0 4px rgba(255,180,200,.2),
+      1px 0 0 rgba(255,180,200,.1);
+  }
+  /* chalk drawn line */
+  .chalk-line {
+    height: 2px; margin: 10px auto;
+    background: repeating-linear-gradient(90deg,
+      rgba(255,255,255,.25) 0px, rgba(255,255,255,.4) 2px,
+      rgba(255,255,255,.1) 4px, rgba(255,255,255,.3) 6px,
+      transparent 8px, rgba(255,255,255,.2) 10px);
+    border-radius: 1px;
+  }
+  .chalk-title {
+    font-family: 'Fredoka One', cursive; font-size: 28px;
+    text-align: center; margin-bottom: 12px;
+    color: rgba(255,255,255,.88);
+    text-shadow:
+      0 0 5px rgba(255,255,255,.2),
+      2px 1px 0 rgba(255,255,255,.08),
+      -1px -1px 0 rgba(255,255,255,.05);
+  }
+  .chalk-step {
+    opacity: 0; transform: translateY(16px) scale(0.97);
+    transition: opacity 1.2s ease, transform 1.2s ease;
+    margin: 16px 0; text-align: center;
+    position: relative;
+  }
+  .chalk-step.visible { opacity: 1; transform: translateY(0) scale(1); }
+  /* chalk writing reveal — wipes content left-to-right like being drawn */
+  @keyframes chalkReveal {
+    0%   { clip-path: inset(0 100% 0 0); opacity: 0.2; filter: blur(2px); }
+    30%  { opacity: 0.6; filter: blur(1px); }
+    100% { clip-path: inset(0 0% 0 0); opacity: 1; filter: blur(0); }
+  }
+  .chalk-write {
+    opacity: 0;
+  }
+  .chalk-step.visible .chalk-write {
+    animation: chalkReveal 1.8s ease-out forwards;
+  }
+  .chalk-step.visible .chalk-write-slow {
+    animation: chalkReveal 3s ease-out forwards;
+  }
+  /* chalk stroke for SVG drawn lines */
+  @keyframes chalkStroke {
+    to { stroke-dashoffset: 0; }
+  }
+  .chalk-svg-line {
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+  }
+  .chalk-step.visible .chalk-svg-line {
+    animation: chalkStroke 2s ease-out forwards;
+  }
+  /* Chalk character-by-character writing for equations */
+  @keyframes chalkCharAppear {
+    0%   { opacity: 0; transform: translateY(4px) rotate(-3deg); filter: blur(2px); }
+    50%  { opacity: 0.6; filter: blur(0.5px); }
+    100% { opacity: 1; transform: translateY(0) rotate(0); filter: blur(0); }
+  }
+  .chalk-char {
+    display: inline-block; opacity: 0;
+    animation: chalkCharAppear 0.4s ease-out forwards;
+  }
+  /* big visual elements */
+  .chalk-big-emoji { font-size: 44px; display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; margin: 8px 0; }
+  .chalk-big-emoji span { display: inline-block; animation: chalkPop .3s ease both; }
+  @keyframes chalkPop { from { transform: scale(0) rotate(-10deg); } to { transform: scale(1) rotate(0); } }
+  .chalk-big-num {
+    font-family: 'Fredoka One', cursive; font-size: 52px; text-align: center;
+    color: rgba(255,235,120,.9);
+    text-shadow: 0 0 8px rgba(255,235,120,.25), 2px 1px 0 rgba(255,235,120,.1);
+  }
+  .chalk-equation {
+    font-family: 'Fredoka One', cursive; font-size: 40px; text-align: center;
+    color: rgba(255,255,255,.9);
+    text-shadow: 0 0 6px rgba(255,255,255,.2), 2px 1px 0 rgba(255,255,255,.08);
+    margin: 8px 0;
+  }
+  .chalk-equation .chalk-op { color: rgba(255,235,120,.85); padding: 0 6px; }
+  .chalk-equation .chalk-ans { color: rgba(130,255,170,.9);
+    text-shadow: 0 0 8px rgba(130,255,170,.3); }
+  /* dots for counting */
+  .chalk-dots { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 8px 0; }
+  .chalk-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, rgba(255,255,255,.95), rgba(200,195,180,.7));
+    box-shadow: 0 0 4px rgba(255,255,255,.2), inset 0 -2px 4px rgba(0,0,0,.1);
+    display: inline-block;
+  }
+  .chalk-dot.group-b {
+    background: radial-gradient(circle at 35% 35%, rgba(255,240,140,.95), rgba(230,200,80,.7));
+    box-shadow: 0 0 4px rgba(255,235,120,.3), inset 0 -2px 4px rgba(0,0,0,.1);
+  }
+  .chalk-dot.borrowed {
+    background: radial-gradient(circle at 35% 35%, rgba(255,200,210,.95), rgba(230,150,170,.7));
+    box-shadow: 0 0 4px rgba(255,180,200,.3);
+  }
+  /* number line */
+  .chalk-number-line {
+    display: flex; align-items: flex-end; justify-content: center; gap: 0;
+    margin: 8px 0; position: relative;
+  }
+  .chalk-tick {
+    width: 40px; text-align: center; font-family: 'Fredoka One', cursive;
+    font-size: 22px; padding-bottom: 6px;
+    color: rgba(255,255,255,.7);
+    border-bottom: 2px solid rgba(255,255,255,.3);
+    text-shadow: 0 0 3px rgba(255,255,255,.15);
+  }
+  .chalk-tick.active {
+    color: rgba(255,235,120,.95); font-size: 28px;
+    border-bottom: 3px solid rgba(255,235,120,.6);
+    text-shadow: 0 0 6px rgba(255,235,120,.3);
+  }
+  .chalk-tick.landed {
+    color: rgba(130,255,170,.95); font-size: 28px;
+    border-bottom: 3px solid rgba(130,255,170,.6);
+    text-shadow: 0 0 6px rgba(130,255,170,.3);
+  }
+  .chalk-hop-row { display: flex; justify-content: center; gap: 0; margin-bottom: 2px; }
+  .chalk-hop-cell {
+    width: 40px; text-align: center; font-family: 'Fredoka One', cursive;
+    font-size: 13px; color: rgba(255,235,120,.8);
+    text-shadow: 0 0 3px rgba(255,235,120,.2);
+  }
+  /* ten frame */
+  .chalk-ten-frame {
+    display: grid; grid-template-columns: repeat(5, 40px); gap: 4px;
+    justify-content: center; margin: 10px 0;
+  }
+  .chalk-ten-cell {
+    width: 40px; height: 40px;
+    border: 2px solid rgba(255,255,255,.3);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+  /* bond circles - now with actual drawn circles */
+  .chalk-bond { text-align: center; margin: 10px 0; position: relative; }
+  .chalk-bond-circle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 64px; height: 64px; border-radius: 50%;
+    border: 3px solid rgba(255,255,255,.5);
+    font-family: 'Fredoka One', cursive; font-size: 28px;
+    box-shadow: 0 0 6px rgba(255,255,255,.1);
+  }
+  .chalk-bond-circle.top { color: rgba(255,235,120,.9); border-color: rgba(255,235,120,.5); }
+  .chalk-bond-circle.bottom { color: rgba(130,255,170,.9); border-color: rgba(130,255,170,.5); }
+  .chalk-bond-arms-svg { display: block; margin: -4px auto; }
+  /* blocks for tens */
+  .chalk-blocks { display: flex; gap: 8px; justify-content: center; margin: 8px 0; }
+  .chalk-block-group { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .chalk-block-stack { display: flex; gap: 2px; }
+  .chalk-block {
+    width: 12px; height: 32px; border-radius: 3px;
+    background: repeating-linear-gradient(180deg,
+      rgba(255,255,255,.5) 0px, rgba(255,255,255,.3) 2px,
+      rgba(255,255,255,.5) 4px);
+    box-shadow: 0 0 3px rgba(255,255,255,.15);
+  }
+  .chalk-block.orange {
+    background: repeating-linear-gradient(180deg,
+      rgba(255,200,100,.6) 0px, rgba(255,200,100,.3) 2px,
+      rgba(255,200,100,.6) 4px);
+    box-shadow: 0 0 3px rgba(255,200,100,.2);
+  }
+  /* pattern arrows */
+  .chalk-arrow-row {
+    display: flex; align-items: center; justify-content: center; gap: 0; margin: 10px 0;
+    font-family: 'Fredoka One', cursive; flex-wrap: wrap;
+  }
+  .chalk-arrow-num {
+    font-size: 32px; padding: 0 3px;
+    color: rgba(255,255,255,.85);
+    text-shadow: 0 0 4px rgba(255,255,255,.15);
+  }
+  .chalk-arrow-num.unknown { color: rgba(255,235,120,.9);
+    text-shadow: 0 0 6px rgba(255,235,120,.25); }
+  .chalk-arrow-label {
+    font-size: 14px; text-align: center;
+    display: flex; flex-direction: column; align-items: center; padding: 0 1px;
+    color: rgba(130,255,170,.85);
+    text-shadow: 0 0 3px rgba(130,255,170,.2);
+  }
+  .chalk-arrow-label .arrow-line {
+    color: rgba(255,255,255,.5); font-size: 14px;
+  }
+  .chalk-plus-sign {
+    font-family: 'Fredoka One', cursive; font-size: 36px;
+    color: rgba(255,235,120,.8); text-align: center;
+    text-shadow: 0 0 4px rgba(255,235,120,.2);
+  }
+  .chalk-divider {
+    color: rgba(255,235,120,.6); font-size: 32px; padding: 0 8px;
+    text-shadow: 0 0 3px rgba(255,235,120,.15);
+  }
+  .btn-learn {
+    background: #1a3a2a; color: #e8e0d0; border: 2px solid #d4a574;
+    border-radius: 12px; padding: 8px 16px; font-size: 15px;
+    font-family: 'Nunito', sans-serif; font-weight: 700;
+    margin: 10px auto 4px; display: block;
+    text-shadow: 0 0 4px rgba(255,255,255,.2);
+  }
+  .btn-learn:hover { background: #244a36; }
+  .chalk-btn-row {
+    display: flex; gap: 12px; justify-content: center; margin-top: 22px;
+    position: relative;
+  }
+  .btn-chalk-close {
+    background: linear-gradient(135deg, #22c55e, #4ade80);
+    color: #065f46; border-radius: 14px; padding: 14px 32px; font-size: 20px;
+    font-family: 'Fredoka One', cursive;
+    box-shadow: 0 3px 10px rgba(34,197,94,.3);
+  }
+  .btn-chalk-replay {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #78350f; border-radius: 14px; padding: 14px 24px; font-size: 20px;
+    font-family: 'Fredoka One', cursive;
+    box-shadow: 0 3px 10px rgba(251,191,36,.3);
+  }
+
+  /* ── util ── */
+  .hidden { display: none !important; }
+  .row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+  .mt { margin-top: 16px; }
+  .title { font-size: 32px; color: var(--text); text-shadow: none; margin: 8px 0 4px; letter-spacing: -0.5px; }
+  .sub   { color: var(--text-sub); font-size: 16px; margin-bottom: 20px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- theme toggle -->
+<button class="btn-theme" id="themeBtn" onclick="toggleTheme()">🌙</button>
+
+<!-- floating stars -->
+<div class="star-bg" id="starBg"></div>
+<div class="confetti-wrap" id="confettiWrap"></div>
+
+<!-- ── SCREEN: name entry (hidden, kept for compat) ── -->
+<div class="card hidden" id="screenName"></div>
+
+<!-- ── SCREEN: home ── -->
+<div class="card" id="screenHome">
+  <h1 class="title" id="helloName">Hi Avyaan!</h1>
+  <p class="sub">What would you like to learn?</p>
+  <div class="row">
+    <button class="btn-mode btn-math" onclick="startMode('math')">
+      <span class="icon">🍎</span> Math
+    </button>
+    <button class="btn-mode btn-verbal" onclick="startMode('verbal')">
+      <span class="icon">📖</span> Words
+    </button>
+    <button class="btn-mode btn-chess" onclick="startMode('chess')">
+      <span class="icon">♟</span> Chess
+    </button>
+  </div>
+</div>
+
+<!-- ── SCREEN: quiz ── -->
+<button class="btn-back hidden" id="backBtn" onclick="goHome()">← Home</button>
+<div class="score-bar hidden" id="scoreBar">
+  <span id="scoreLabel">⭐ 0 correct</span>
+  <span class="streak hidden" id="streakLabel">🔥 0 streak!</span>
+</div>
+<div class="card hidden" id="screenQuiz">
+  <div class="feedback" id="feedback"></div>
+  <div id="questionArea"></div>
+</div>
+
+<!-- screenBoard kept as empty hidden div for JS compat -->
+<div class="hidden" id="screenBoard"></div>
+
+<!-- ── MODAL: chalkboard tutorial ── -->
+<div class="chalkboard-overlay hidden" id="chalkOverlay" onclick="closeTutorial()">
+  <div class="chalkboard" onclick="event.stopPropagation()">
+    <div id="chalkContent"></div>
+    <div class="chalk-btn-row">
+      <button class="btn-chalk-replay" onclick="replayTutorial()">🔄</button>
+      <button class="btn-chalk-close" onclick="closeTutorial()">Got it! ✨</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── theme toggle ──────────────────────────────────────────────────────────
+(function() {
+  const saved = localStorage.getItem("theme");
+  if(saved === "dark") {
+    document.documentElement.setAttribute("data-theme", "dark");
+    document.getElementById("themeBtn").textContent = "☀️";
+  }
+})();
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  if(isDark) {
+    document.documentElement.removeAttribute("data-theme");
+    document.getElementById("themeBtn").textContent = "🌙";
+    localStorage.setItem("theme", "light");
+  } else {
+    document.documentElement.setAttribute("data-theme", "dark");
+    document.getElementById("themeBtn").textContent = "☀️";
+    localStorage.setItem("theme", "dark");
+  }
+}
+
+// ── state ──────────────────────────────────────────────────────────────────
+let playerName = "Avyaan";
+let questions  = [];
+let qIndex     = 0;
+let sessionCorrect = 0;
+let sessionTotal   = 0;
+let streak = 0;
+let wrongCount = 0;       // how many wrong attempts on current question
+let currentHint = "";     // hint for current question
+let currentCorrect = "";  // correct answer for current question
+
+// ── stars ──────────────────────────────────────────────────────────────────
+(function() {
+  const bg = document.getElementById("starBg");
+  const stars = ["⭐","🌟","✨","💫"];
+  for(let i=0;i<12;i++){
+    const s = document.createElement("div");
+    s.className = "star";
+    s.textContent = stars[i%stars.length];
+    s.style.left = `${(i*17+7)%100}%`;
+    s.style.top  = `${(i*23+5)%100}%`;
+    s.style.animationDelay = `${i*0.28}s`;
+    s.style.fontSize = `${12+i%10}px`;
+    bg.appendChild(s);
+  }
+})();
+
+// ── screens ────────────────────────────────────────────────────────────────
+function show(id) {
+  ["screenName","screenHome","screenQuiz","screenBoard"].forEach(s=>
+    document.getElementById(s).classList.add("hidden")
+  );
+  document.getElementById(id).classList.remove("hidden");
+}
+
+function goHome() {
+  document.getElementById("backBtn").classList.add("hidden");
+  document.getElementById("scoreBar").classList.add("hidden");
+  show("screenHome");
+}
+
+// ── name is hardcoded ──────────────────────────────────────────────────────
+
+// ── start mode ─────────────────────────────────────────────────────────────
+async function startMode(mode) {
+  sessionCorrect = 0; sessionTotal = 0; streak = 0; qIndex = 0; wrongCount = 0;
+  updateScoreBar();
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("backBtn").classList.remove("hidden");
+  document.getElementById("scoreBar").classList.remove("hidden");
+  show("screenQuiz");
+  const res = await fetch(`/api/questions/${mode}?player_name=${encodeURIComponent(playerName)}`);
+  questions = await res.json();
+  questions._mode = mode;
+  renderQuestion();
+}
+
+// ── score bar ──────────────────────────────────────────────────────────────
+function updateScoreBar() {
+  document.getElementById("scoreLabel").textContent = `⭐ ${sessionCorrect} correct`;
+  const sl = document.getElementById("streakLabel");
+  if(streak >= 3) { sl.textContent = `🔥 ${streak} streak!`; sl.classList.remove("hidden"); }
+  else sl.classList.add("hidden");
+}
+
+// ── helper: escape HTML for safe rendering ─────────────────────────────────
+function esc(s) {
+  const d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ── render question ────────────────────────────────────────────────────────
+function renderQuestion() {
+  if(qIndex >= questions.length) { showSummary(); return; }
+  const q = questions[qIndex];
+  const area = document.getElementById("questionArea");
+  document.getElementById("feedback").textContent = "";
+  wrongCount = 0;
+  currentHint = q.hint || "";
+  currentCorrect = "";
+
+  if(q.type === "addition" || q.type === "subtraction") {
+    currentCorrect = String(q.answer);
+    const learnBtn = q.type === "addition" ? `<button class="btn-learn" onclick="showTutorial()">💡 How to solve</button>` : "";
+    area.innerHTML = `
+      <p class="q-text" style="font-size:36px;font-family:'Fredoka One',cursive;color:var(--purple)">${esc(q.display)}</p>
+      ${learnBtn}
+      <div class="opt-row">${makeArithOpts(q.answer, q.id)}</div>`;
+
+  } else if(q.type === "number_order") {
+    currentCorrect = String(q.answer);
+    area.innerHTML = `
+      <p class="q-text">${esc(q.question)}</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${o}','${q.answer}','${q.id}')" style="font-size:24px;padding:14px 22px">${o}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "bigger") {
+    currentCorrect = String(Math.max(q.a, q.b));
+    area.innerHTML = `
+      <p class="q-text">Which number is <b>bigger</b>? 🤔</p>
+      <div class="row">
+        ${[q.a, q.b].map(n=>`
+          <button class="pick-btn" onclick="checkAnswer('${n}','${Math.max(q.a,q.b)}','${q.id}')">
+            <span class="pick-num">${n}</span>
+          </button>`).join("")}
+      </div>`;
+
+  } else if(q.type === "pattern") {
+    currentCorrect = String(q.answer);
+    area.innerHTML = `
+      <p class="q-text">What comes next? 🔢</p>
+      <p style="font-size:32px;margin:12px 0;font-family:'Fredoka One',cursive;color:var(--purple)">${esc(q.display)}</p>
+      <button class="btn-learn" onclick="showTutorial()">💡 How to solve</button>
+      <div class="opt-row">${makePatternOpts(q.answer, q.id)}</div>`;
+
+  } else if(q.type === "shape") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <p class="q-text">${q.emoji} ${esc(q.description)}</p>
+      <p class="q-text"><b>What shape is this?</b></p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:20px;padding:14px 20px;text-transform:capitalize">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "sorting") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <p class="q-text">${esc(q.question)}</p>
+      <div class="emoji-grid">${q.items.map((item,i)=>
+        `<span class="big-emoji" style="animation-delay:${i*0.06}s">${item}</span>`
+      ).join("")}</div>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:32px;padding:14px 22px">${o}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "more_less") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <p class="q-text">${esc(q.question)}</p>
+      <div class="group-row">
+        <div class="group-box" onclick="checkAnswer('left','${q.answer}','${q.id}')">${q.left}</div>
+        <span style="font-size:28px;font-family:'Fredoka One',cursive;color:var(--purple)">or</span>
+        <div class="group-box" onclick="checkAnswer('right','${q.answer}','${q.id}')">${q.right}</div>
+      </div>`;
+
+  } else if(q.type === "rhyme") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <p class="q-text">${q.emoji} What rhymes with <b>${esc(q.word)}</b>?</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "sight_word") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <div style="font-size:72px;margin:8px 0">${q.emoji}</div>
+      <p class="q-text">Which word says <b>${esc(q.word).toUpperCase()}</b>?</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:24px;padding:14px 22px;text-transform:lowercase;font-family:'Nunito',sans-serif;font-weight:800">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "spelling") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <div style="font-size:72px;margin:8px 0">${q.emoji}</div>
+      <p class="q-text">How do you spell <b>${esc(q.word).toUpperCase()}</b>?</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:24px;padding:14px 22px;text-transform:lowercase;font-family:'Nunito',sans-serif;font-weight:800;letter-spacing:2px">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "sentence") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <p class="q-text" style="font-size:28px">${esc(q.sentence)}</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:22px;padding:14px 22px;text-transform:lowercase;font-family:'Nunito',sans-serif;font-weight:800">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "word") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <p class="q-text">${esc(q.question)}</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:18px;padding:14px 18px">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "sound") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <div style="font-size:72px;margin:8px 0">${q.emoji}</div>
+      <p class="q-text">${esc(q.question)}</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:20px;padding:14px 20px">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "opposite") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <div style="font-size:56px;margin:8px 0">${q.emoji}</div>
+      <p class="q-text">What is the <b>opposite</b> of <b>${esc(q.word)}</b>?</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:20px;padding:14px 20px;text-transform:capitalize">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "chess") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <div id="chessBoard" class="chess-board">${buildChessBoard(q.piece, q.animation)}</div>
+      <p class="q-text">${q.emoji} ${esc(q.question)}</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:18px;padding:14px 20px">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "letter") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <div style="font-size:72px;margin:8px 0">${q.emoji}</div>
+      <p class="q-text">${esc(q.question)}</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:28px;padding:16px 24px;font-weight:800">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "color") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <div style="font-size:72px;margin:8px 0">${q.emoji}</div>
+      <p class="q-text">What color is a <b>${esc(q.object)}</b>?</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:20px;padding:14px 20px">${esc(o)}</button>`
+      ).join("")}</div>`;
+  }
+
+  // Add skip button to every question
+  area.innerHTML += `<button class="btn-skip" onclick="skipQuestion()">Skip ⏭️</button>`;
+}
+
+function skipQuestion() {
+  qIndex++;
+  renderQuestion();
+}
+
+function makeArithOpts(answer, qid) {
+  const pool = new Set([answer]);
+  while(pool.size < 4) {
+    const offset = Math.floor(Math.random()*5)+1;
+    const candidate = answer + (Math.random()<0.5 ? offset : -offset);
+    if(candidate >= 0) pool.add(candidate);
+  }
+  return [...pool].sort((a,b)=>a-b).map(v=>
+    `<button class="btn-answer" onclick="checkAnswer('${v}','${answer}','${qid}')" style="font-size:28px;padding:16px 24px">${v}</button>`
+  ).join("");
+}
+
+function makePatternOpts(answer, qid) {
+  const pool = new Set([answer]);
+  while(pool.size < 4) pool.add(answer + (Math.floor(Math.random()*6)-3));
+  return [...pool].filter(v=>v>0).sort((a,b)=>a-b).map(v=>
+    `<button class="btn-answer" onclick="checkAnswer('${v}','${answer}','${qid}')">${v}</button>`
+  ).join("");
+}
+
+// ── chess board builder ──────────────────────────────────────────────────
+function buildChessBoard(piece, animation) {
+  const center = 12; // center of 5x5 grid (index 12 = row 2, col 2)
+  const pieceEmojis = {king:"♚", queen:"♛", rook:"♜", bishop:"♝", knight:"♞", pawn:"♟"};
+  const emoji = pieceEmojis[piece] || "♟";
+
+  // Calculate valid move squares relative to center (row 2, col 2) on 5x5
+  const highlights = new Set();
+  const paths = new Set();
+
+  if(animation === "king") {
+    // All 8 surrounding squares
+    [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]].forEach(([dr,dc])=>{
+      const r=2+dr, c=2+dc;
+      if(r>=0&&r<5&&c>=0&&c<5) highlights.add(r*5+c);
+    });
+  } else if(animation === "queen") {
+    // All 8 directions
+    for(let d of [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]) {
+      for(let s=1;s<3;s++) {
+        const r=2+d[0]*s, c=2+d[1]*s;
+        if(r>=0&&r<5&&c>=0&&c<5) highlights.add(r*5+c);
+      }
+    }
+  } else if(animation === "rook") {
+    // Horizontal + vertical from center
+    for(let i=0;i<5;i++) { if(i!==2) { highlights.add(2*5+i); highlights.add(i*5+2); } }
+  } else if(animation === "bishop") {
+    // Diagonals from center
+    for(let s=-2;s<=2;s++) {
+      if(s===0) continue;
+      let r1=2+s, c1=2+s, r2=2+s, c2=2-s;
+      if(r1>=0&&r1<5&&c1>=0&&c1<5) highlights.add(r1*5+c1);
+      if(r2>=0&&r2<5&&c2>=0&&c2<5) highlights.add(r2*5+c2);
+    }
+  } else if(animation === "knight") {
+    // L-shaped moves
+    [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]].forEach(([dr,dc])=>{
+      const r=2+dr, c=2+dc;
+      if(r>=0&&r<5&&c>=0&&c<5) highlights.add(r*5+c);
+    });
+    // Show L-path for one move (up 2, right 1)
+    paths.add(1*5+2); // intermediate step
+  } else if(animation === "pawn") {
+    // Forward 1 and 2 squares (up from center)
+    highlights.add(1*5+2);
+    highlights.add(0*5+2);
+  }
+
+  let html = "";
+  for(let i=0;i<25;i++) {
+    const r = Math.floor(i/5), c = i%5;
+    const shade = (r+c)%2===0 ? "light" : "dark";
+    let inner = "";
+    if(i === center) inner = `<span class="chess-piece">${emoji}</span>`;
+    else if(highlights.has(i)) inner = `<span class="chess-highlight" style="animation-delay:${(i%5)*0.12}s"></span>`;
+    if(paths.has(i)) inner += `<span class="chess-path" style="animation-delay:${(i%5)*0.08}s"></span>`;
+    html += `<div class="chess-cell ${shade}">${inner}</div>`;
+  }
+  return html;
+}
+
+// ── check answer (with hint on first wrong, reveal on second) ─────────────
+async function checkAnswer(given, correct, qid) {
+  const isOk = String(given) === String(correct);
+  const mode = questions._mode;
+
+  if(!isOk && wrongCount === 0) {
+    // First wrong: show hint + try again
+    wrongCount = 1;
+    document.querySelectorAll("#questionArea button, #questionArea .group-box").forEach(b=>b.style.pointerEvents="none");
+
+    const fb = document.getElementById("feedback");
+    fb.textContent = "Not quite! 🤔";
+    fb.className = "feedback bad";
+    playSound("wrong");
+
+    // Record wrong attempt
+    fetch("/api/answer", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({player_name: playerName, mode, question_id: qid, correct: false})
+    });
+
+    // Show hint and retry button
+    const area = document.getElementById("questionArea");
+    area.innerHTML += `
+      <div class="hint-box">💡 Hint: ${esc(currentHint)}</div>
+      <button class="btn-retry" onclick="retryQuestion()">Try again! 💪</button>`;
+    return;
+  }
+
+  // Either correct, or second wrong attempt
+  sessionTotal++;
+  if(isOk) { sessionCorrect++; streak++; confetti(); }
+  else streak = 0;
+  updateScoreBar();
+
+  // disable all buttons
+  document.querySelectorAll("#questionArea button, #questionArea .group-box").forEach(b=>{b.disabled=true; b.style.pointerEvents="none";});
+
+  const fb = document.getElementById("feedback");
+  const res = await fetch("/api/answer", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({player_name: playerName, mode, question_id: qid, correct: isOk})
+  });
+  const data = await res.json();
+
+  if(isOk) {
+    fb.textContent = data.message;
+    fb.className = "feedback ok";
+    playSound("correct");
+  } else {
+    fb.textContent = `The answer is: ${currentCorrect}`;
+    fb.className = "feedback bad";
+    playSound("wrong");
+  }
+
+  setTimeout(()=>{ qIndex++; renderQuestion(); }, 2000);
+}
+
+// ── retry after hint ──────────────────────────────────────────────────────
+function retryQuestion() {
+  // Re-render the same question (wrongCount stays 1 so next wrong = reveal)
+  wrongCount = 1;
+  const q = questions[qIndex];
+  document.getElementById("feedback").textContent = "";
+  // Re-render fully
+  const saveWrong = wrongCount;
+  renderQuestion();
+  wrongCount = saveWrong; // preserve that we already had one wrong
+}
+
+// ── summary ────────────────────────────────────────────────────────────────
+function showSummary() {
+  const pct = sessionTotal ? Math.round((sessionCorrect/sessionTotal)*100) : 0;
+  document.getElementById("questionArea").innerHTML = `
+    <div style="font-size:64px;margin:8px 0">🎉</div>
+    <h2 style="font-family:'Fredoka One',cursive;color:var(--purple);font-size:28px">All done!</h2>
+    <p style="font-size:22px;margin:10px 0">${sessionCorrect} / ${sessionTotal} correct (${pct}%)</p>
+    <div class="mt row">
+      <button class="btn-primary" onclick="startMode(questions._mode)">Play again 🔄</button>
+      <button class="btn-primary" style="background:linear-gradient(135deg,#43e97b,#38f9d7);color:#065f46" onclick="goHome()">Home 🏠</button>
+    </div>`;
+  if(pct===100) confetti(60);
+}
+
+// ── leaderboard ────────────────────────────────────────────────────────────
+async function showBoard() {
+  show("screenBoard");
+  // personal progress
+  const pr = await fetch(`/api/progress/${encodeURIComponent(playerName)}`);
+  const prData = await pr.json();
+  const pa = document.getElementById("progressArea");
+  pa.innerHTML = `<h3 style="font-family:'Fredoka One',cursive;color:var(--purple);margin-bottom:8px">${esc(playerName)}'s Progress</h3>`;
+  for(const [mode, stat] of Object.entries(prData.progress||{})) {
+    const pct = stat.total ? Math.round(stat.correct/stat.total*100) : 0;
+    const modeLabel = mode === "math" ? "🍎 Math" : mode === "chess" ? "♟ Chess" : "📖 Words";
+    pa.innerHTML += `
+      <div class="progress-block">
+        <h3>${modeLabel} — ${stat.correct}/${stat.total} (${pct}%)</h3>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%"></div></div>
+      </div>`;
+  }
+  if(!Object.keys(prData.progress||{}).length) pa.innerHTML += `<p style="color:#9ca3af;margin-top:8px">No answers yet — go play! 🎮</p>`;
+
+  // leaderboard
+  const lb = await fetch("/api/leaderboard");
+  const lbData = await lb.json();
+  const la = document.getElementById("leaderboardArea");
+  if(!lbData.length) { la.innerHTML = `<p style="color:#9ca3af">No scores yet!</p>`; return; }
+  la.innerHTML = `<table>
+    <tr><th>#</th><th>Player</th><th>⭐ Score</th><th>Tries</th></tr>
+    ${lbData.map((r,i)=>`<tr>
+      <td>${["🥇","🥈","🥉"][i]||i+1}</td>
+      <td>${esc(r.player_name)}</td>
+      <td>${r.score}</td>
+      <td>${r.attempts}</td>
+    </tr>`).join("")}
+  </table>`;
+}
+
+// ── sound effects (Web Audio API) ─────────────────────────────────────────
+let _audioCtx = null;
+function getAudioCtx() {
+  if(!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return _audioCtx;
+}
+
+function playSound(type) {
+  const ctx = getAudioCtx();
+  const now = ctx.currentTime;
+
+  if(type === "correct") {
+    // Cheerful ascending two-tone chime
+    [0, 0.15].forEach((delay, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = i === 0 ? 523.25 : 659.25; // C5 → E5
+      gain.gain.setValueAtTime(0.3, now + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.3);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now + delay);
+      osc.stop(now + delay + 0.3);
+    });
+  } else if(type === "wrong") {
+    // Gentle descending tone
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(330, now);       // E4
+    osc.frequency.linearRampToValueAtTime(220, now + 0.3); // → A3
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.35);
+  }
+}
+
+// ── confetti ───────────────────────────────────────────────────────────────
+function confetti(count=20) {
+  const wrap = document.getElementById("confettiWrap");
+  const colors = ["#6366f1","#10b981","#f59e0b","#ec4899","#06b6d4","#8b5cf6"];
+  for(let i=0;i<count;i++) {
+    const el = document.createElement("div");
+    el.className = "conf";
+    el.style.left  = Math.random()*100 + "vw";
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    el.style.animationDelay = Math.random()*0.5 + "s";
+    el.style.animationDuration = (0.8+Math.random()*0.6) + "s";
+    el.style.width  = (8+Math.random()*8) + "px";
+    el.style.height = (8+Math.random()*8) + "px";
+    wrap.appendChild(el);
+    setTimeout(()=>el.remove(), 1500);
+  }
+}
+
+// ── chalkboard tutorials ────────────────────────────────────────────────
+let _tutorialInterval = null;
+
+// Spawn chalk dust particles near the board
+function spawnChalkDust(container, count) {
+  for (let i = 0; i < count; i++) {
+    const d = document.createElement("div");
+    d.className = "chalk-dust";
+    d.style.left = (20 + Math.random() * 60) + "%";
+    d.style.bottom = (10 + Math.random() * 40) + "%";
+    d.style.animationDelay = (Math.random() * 1.5) + "s";
+    d.style.animationDuration = (1.5 + Math.random()) + "s";
+    container.appendChild(d);
+    setTimeout(() => d.remove(), 3000);
+  }
+}
+
+// Make emoji strings for a count (🍎🍎🍎)
+function makeEmoji(n, emoji) {
+  let s = "";
+  for (let i = 0; i < n; i++) s += `<span style="animation-delay:${i*0.08}s">${emoji}</span>`;
+  return s;
+}
+
+// Hand/finger emoji for numbers 1-10
+function fingerEmoji(n) {
+  if (n <= 0) return "";
+  const hands = { 1:"☝️", 2:"✌️", 3:"🤟", 4:"🖖", 5:"🖐️",
+    6:"🖐️☝️", 7:"🖐️✌️", 8:"🖐️🤟", 9:"🖐️🖖", 10:"🖐️🖐️" };
+  return hands[n] || `${n}`;
+}
+
+// Chalk writing sound — longer scratchy sound like chalk on board
+function playChalkWrite(duration) {
+  try {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    const dur = duration || 0.4;
+    const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) {
+      const t = i / ctx.sampleRate;
+      // Scratchy noise with volume envelope
+      const env = Math.min(1, t * 20) * Math.max(0, 1 - t / dur);
+      const scratch = (Math.random() * 2 - 1) * 0.5;
+      // Periodic scrape feel like chalk dragging
+      const scrape = Math.sin(t * 600 + Math.sin(t * 80) * 6) * 0.25;
+      data[i] = (scratch + scrape) * env;
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const g = ctx.createGain();
+    g.gain.value = 0.25;
+    const hp = ctx.createBiquadFilter();
+    hp.type = "highpass"; hp.frequency.value = 600;
+    const lp = ctx.createBiquadFilter();
+    lp.type = "lowpass"; lp.frequency.value = 5000;
+    src.connect(hp).connect(lp).connect(g).connect(ctx.destination);
+    src.start(now);
+  } catch(e) {}
+}
+
+// Teacher voice narration using Web Speech API — slow & warm
+function chalkSpeak(text) {
+  if (!text || !window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.rate = 0.72;   // slow — toddler-friendly pace
+  utter.pitch = 1.15;  // warm, friendly
+  utter.volume = 0.9;
+  // Try to pick a friendly voice
+  const voices = speechSynthesis.getVoices();
+  const preferred = voices.find(v => /samantha|karen|victoria|fiona|moira/i.test(v.name))
+    || voices.find(v => v.lang.startsWith("en") && /female/i.test(v.name))
+    || voices.find(v => v.lang.startsWith("en"));
+  if (preferred) utter.voice = preferred;
+  speechSynthesis.speak(utter);
+}
+
+function showTutorial() {
+  const q = questions[qIndex];
+  const el = document.getElementById("chalkContent");
+  if (q.type === "addition") {
+    el.innerHTML = buildTutorialAddition(q);
+  } else if (q.type === "pattern") {
+    el.innerHTML = buildTutorialPattern(q);
+  } else {
+    return;
+  }
+  const overlay = document.getElementById("chalkOverlay");
+  overlay.classList.remove("hidden");
+
+  // Preload voices (some browsers need this)
+  if (window.speechSynthesis) speechSynthesis.getVoices();
+
+  const board = overlay.querySelector(".chalkboard");
+  spawnChalkDust(board, 8);
+
+  // Animate steps in one at a time — slower pace
+  const steps = el.querySelectorAll(".chalk-step");
+  let i = 0;
+  function revealStep(idx) {
+    if (idx >= steps.length) return;
+    steps[idx].classList.add("visible");
+    playChalkWrite(0.8);
+    spawnChalkDust(board, 3);
+    // Speak the data-speak attribute if present
+    const speech = steps[idx].getAttribute("data-speak");
+    if (speech) chalkSpeak(speech);
+  }
+
+  if (steps.length) revealStep(0);
+  i = 1;
+  _tutorialInterval = setInterval(() => {
+    if (i >= steps.length) { clearInterval(_tutorialInterval); _tutorialInterval = null; return; }
+    revealStep(i);
+    i++;
+  }, 3500);
+}
+
+function replayTutorial() {
+  // Stop current animation & speech, then restart
+  if (_tutorialInterval) { clearInterval(_tutorialInterval); _tutorialInterval = null; }
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  // Reset all steps to hidden
+  document.querySelectorAll("#chalkContent .chalk-step").forEach(s => s.classList.remove("visible"));
+  // Restart after brief pause
+  setTimeout(() => showTutorial(), 300);
+}
+
+function closeTutorial() {
+  document.getElementById("chalkOverlay").classList.add("hidden");
+  if (_tutorialInterval) { clearInterval(_tutorialInterval); _tutorialInterval = null; }
+  if (window.speechSynthesis) speechSynthesis.cancel();
+}
+
+// ── Addition tutorial builders (visual + speech + chalk-write) ───────
+
+function buildTutorialAddition(q) {
+  const a = q.a, b = q.b, ans = q.answer;
+  const method = q.method || "count_on";
+  const eA = "🍎", eB = "🍊";
+
+  // Helper: chalk-written equation — each character appears like being drawn
+  function eq(a, op, b, result) {
+    const parts = [`${a}`, ` ${op} `, `${b}`, ` = `, `${result}`];
+    const classes = ['', 'chalk-op', '', 'chalk-op', 'chalk-ans'];
+    let html = '', delay = 0;
+    parts.forEach((part, pi) => {
+      for (const ch of part) {
+        if (ch === ' ') { html += ' '; continue; }
+        html += `<span class="chalk-char ${classes[pi]}" style="animation-delay:${delay.toFixed(2)}s">${ch}</span>`;
+        delay += 0.18;
+      }
+    });
+    return `<div class="chalk-equation">${html}</div>`;
+  }
+
+  if (method === "count_on") {
+    const bigger = Math.max(a, b), smaller = Math.min(a, b);
+    const start = Math.max(0, bigger - 1), end = ans + 1;
+    let ticks = "";
+    for (let n = start; n <= end; n++) {
+      const cls = n === bigger ? "active" : n === ans ? "landed" : "";
+      ticks += `<div class="chalk-tick ${cls}">${n}</div>`;
+    }
+    let hops = "";
+    for (let n = start; n <= end; n++) {
+      hops += `<div class="chalk-hop-cell">${(n >= bigger && n < ans) ? "⌒" : ""}</div>`;
+    }
+    // Count narration: "5, 6, 7!"
+    const countWords = Array.from({length: smaller}, (_, i) => bigger + i + 1).join(", ");
+    return `
+      <div class="chalk-title chalk-text">🔢 🐸</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="We start at ${bigger}">
+        <div class="chalk-big-num chalk-write">${bigger}</div>
+        <div class="chalk-big-emoji">${makeEmoji(bigger, eA)}</div>
+      </div>
+      <div class="chalk-step" data-speak="Now jump ${smaller} times! ${countWords}!">
+        <div class="chalk-big-emoji" style="font-size:36px">${"🐸 ".repeat(smaller)}</div>
+        <div class="chalk-hop-row chalk-write">${hops}</div>
+        <div class="chalk-number-line chalk-write-slow">${ticks}</div>
+      </div>
+      <div class="chalk-step" data-speak="${a} plus ${b} equals ${ans}!">
+        ${eq(a, "+", b, ans)}
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  if (method === "count_all") {
+    const countWords = Array.from({length: ans}, (_, i) => i + 1).join(", ");
+    return `
+      <div class="chalk-title chalk-text">${eA} + ${eB}</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="Here are ${a} apples">
+        <div class="chalk-big-emoji">${makeEmoji(a, eA)}</div>
+        <div class="chalk-big-num chalk-write">${a}</div>
+      </div>
+      <div class="chalk-step" data-speak="And ${b} oranges">
+        <div class="chalk-big-emoji">${makeEmoji(b, eB)}</div>
+        <div class="chalk-big-num chalk-write">${b}</div>
+      </div>
+      <div class="chalk-step" data-speak="Now let's count them all! ${countWords}!">
+        <div class="chalk-big-emoji">${makeEmoji(a, eA)} ${makeEmoji(b, eB)}</div>
+        <div class="chalk-text chalk-yellow chalk-write" style="font-size:22px;margin-top:6px">${Array.from({length:ans},(_,i)=>`<span style="animation-delay:${i*0.15}s;display:inline-block;animation:chalkPop .3s ease both">${i+1}</span>`).join(" ")}</div>
+      </div>
+      <div class="chalk-step" data-speak="${a} plus ${b} equals ${ans}! Great job!">
+        ${eq(a, "+", b, ans)}
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  if (method === "doubles") {
+    const n = Math.min(a, b);
+    return `
+      <div class="chalk-title chalk-text">🪞</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="${n} on this side, and ${n} on that side. They're the same!">
+        <div style="display:flex;align-items:center;justify-content:center;gap:16px">
+          <div class="chalk-big-emoji">${makeEmoji(n, eA)}</div>
+          <span class="chalk-divider">|</span>
+          <div class="chalk-big-emoji">${makeEmoji(n, eA)}</div>
+        </div>
+        <div class="chalk-text chalk-yellow chalk-write" style="font-size:24px;margin-top:6px">${n} 🪞 ${n}</div>
+      </div>
+      <div class="chalk-step" data-speak="Double ${n} is ${ans}!">
+        ${eq(a, "+", b, ans)}
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  if (method === "number_bond") {
+    return `
+      <div class="chalk-title chalk-text">🔗</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="${a} and ${b} are best friends! Together they make ${ans}">
+        <div class="chalk-bond">
+          <div class="chalk-bond-circle top">${ans}</div>
+          <svg class="chalk-bond-arms-svg" width="140" height="40" viewBox="0 0 140 40">
+            <line class="chalk-svg-line" x1="50" y1="4" x2="20" y2="36" stroke="rgba(255,255,255,.5)" stroke-width="2.5"/>
+            <line class="chalk-svg-line" x1="90" y1="4" x2="120" y2="36" stroke="rgba(255,255,255,.5)" stroke-width="2.5" style="animation-delay:.3s"/>
+          </svg>
+          <div style="display:flex;justify-content:center;gap:40px">
+            <div class="chalk-bond-circle bottom">${a}</div>
+            <div class="chalk-bond-circle bottom">${b}</div>
+          </div>
+        </div>
+      </div>
+      <div class="chalk-step" data-speak="See? ${a} apples and ${b} oranges">
+        <div class="chalk-big-emoji">${makeEmoji(Math.min(a,12), eA)} <span style="font-size:32px">➕</span> ${makeEmoji(Math.min(b,12), eB)}</div>
+      </div>
+      <div class="chalk-step" data-speak="${a} plus ${b} equals ${ans}!">
+        ${eq(a, "+", b, ans)}
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  if (method === "make_10") {
+    // Simple visual: show both groups, move some over to make 10, show leftover
+    // e.g. 9+6: show 9 apples & 6 oranges → move 1 orange to apples → 10 + 5 = 15
+    const bigger = Math.max(a, b), smaller = Math.min(a, b);
+    const borrow = 10 - bigger;  // how many to move over
+    const leftover = smaller - borrow;
+
+    // Step 1: show the two groups side by side
+    // Step 2: show the borrow — apples get bigger, oranges get smaller, with arrow
+    // Step 3: 10 + leftover = answer
+
+    return `
+      <div class="chalk-title chalk-text">🔟</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="${bigger} apples, and ${smaller} oranges">
+        <div style="display:flex;align-items:center;justify-content:center;gap:14px">
+          <div><div class="chalk-big-emoji">${makeEmoji(bigger, eA)}</div><div class="chalk-text chalk-yellow chalk-write" style="font-size:24px">${bigger}</div></div>
+          <div class="chalk-plus-sign chalk-write" style="font-size:28px">+</div>
+          <div><div class="chalk-big-emoji">${makeEmoji(smaller, eB)}</div><div class="chalk-text chalk-yellow chalk-write" style="font-size:24px">${smaller}</div></div>
+        </div>
+      </div>
+      <div class="chalk-step" data-speak="Move ${borrow} over to make 10!">
+        <div style="display:flex;align-items:center;justify-content:center;gap:14px">
+          <div><div class="chalk-big-emoji">${makeEmoji(bigger, eA)}${makeEmoji(borrow, eB)}</div><div class="chalk-text chalk-green chalk-write" style="font-size:28px">🔟</div></div>
+          <div class="chalk-plus-sign chalk-write" style="font-size:28px">+</div>
+          <div><div class="chalk-big-emoji">${makeEmoji(leftover, eB)}</div><div class="chalk-text chalk-yellow chalk-write" style="font-size:24px">${leftover}</div></div>
+        </div>
+      </div>
+      <div class="chalk-step" data-speak="10 plus ${leftover} equals ${ans}!">
+        ${eq(a, "+", b, ans)}
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  if (method === "add_tens") {
+    const tensA = Math.round(a / 10), tensB = Math.round(b / 10);
+    let blocksA = "", blocksB = "";
+    for (let i = 0; i < tensA; i++) blocksA += `<div class="chalk-block-group"><div class="chalk-block-stack"><div class="chalk-block"></div></div></div>`;
+    for (let i = 0; i < tensB; i++) blocksB += `<div class="chalk-block-group"><div class="chalk-block-stack"><div class="chalk-block orange"></div></div></div>`;
+    return `
+      <div class="chalk-title chalk-text">🧱</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="${tensA} tens, that's ${a}">
+        <div class="chalk-blocks">${blocksA}</div>
+        <div class="chalk-text chalk-yellow chalk-write" style="font-size:28px">${a}</div>
+      </div>
+      <div class="chalk-step" data-speak="Plus ${tensB} tens, that's ${b}">
+        <div class="chalk-plus-sign chalk-write">+</div>
+        <div class="chalk-blocks">${blocksB}</div>
+        <div class="chalk-text chalk-yellow chalk-write" style="font-size:28px">${b}</div>
+      </div>
+      <div class="chalk-step" data-speak="${a} plus ${b} equals ${ans}!">
+        ${eq(a, "+", b, ans)}
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  if (method === "add_to_10") {
+    const fingers = (b <= 10) ? fingerEmoji(b) : b;
+    return `
+      <div class="chalk-title chalk-text">🔟 ➕</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="We have ${a}">
+        <div class="chalk-big-num chalk-write">${a}</div>
+        <div style="font-size:40px">${fingerEmoji(Math.min(a, 10))}</div>
+      </div>
+      <div class="chalk-step" data-speak="Plus ${b} more!">
+        <div class="chalk-plus-sign chalk-write">+</div>
+        <div class="chalk-big-num chalk-write">${b}</div>
+        <div style="font-size:40px">${typeof fingers === 'string' && fingers.length > 3 ? fingers : `<span style="font-size:48px">${fingers}</span>`}</div>
+      </div>
+      <div class="chalk-step" data-speak="${a} plus ${b} equals ${ans}!">
+        ${eq(a, "+", b, ans)}
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  // Fallback
+  return `
+    <div class="chalk-title chalk-text">➕</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="Here are ${a}">
+      <div class="chalk-big-emoji">${makeEmoji(Math.min(a, 15), eA)}</div>
+      <div class="chalk-big-num chalk-write">${a}</div>
+    </div>
+    <div class="chalk-step" data-speak="Plus ${b} more">
+      <div class="chalk-plus-sign chalk-write">+</div>
+      <div class="chalk-big-emoji">${makeEmoji(Math.min(b, 15), eB)}</div>
+      <div class="chalk-big-num chalk-write">${b}</div>
+    </div>
+    <div class="chalk-step" data-speak="${a} plus ${b} equals ${ans}!">
+      ${eq(a, "+", b, ans)}
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Pattern tutorial builders (visual + speech + chalk-write) ────────
+
+function buildTutorialPattern(q) {
+  const seq = (q.seq || []).filter(v => v !== null && v !== undefined);
+  const ans = q.answer;
+
+  if (seq.length < 2) {
+    return `<div class="chalk-title chalk-text">🔢</div>
+      <div class="chalk-step" data-speak="The answer is ${ans}!"><div class="chalk-big-num chalk-write">${ans}</div><div style="font-size:48px">🎉</div></div>`;
+  }
+
+  const diffs = [];
+  for (let i = 1; i < seq.length; i++) diffs.push(seq[i] - seq[i - 1]);
+  const allSameDiff = diffs.every(d => d === diffs[0]);
+
+  const ratios = [];
+  for (let i = 1; i < seq.length; i++) ratios.push(seq[i] / seq[i - 1]);
+  const allDouble = seq[0] !== 0 && ratios.every(r => r === 2);
+
+  let isFib = seq.length >= 3;
+  for (let i = 2; i < seq.length; i++) {
+    if (seq[i] !== seq[i - 1] + seq[i - 2]) { isFib = false; break; }
+  }
+
+  const seqWithAnswer = [...seq, ans];
+  const seqStr = seq.join(", ");
+
+  // Check constant difference FIRST — it's the most common and simplest pattern.
+  // Must come before fibonacci, since sequences like 10,20,30 pass both checks
+  // (10+20=30) but are clearly "+10" not fibonacci.
+  if (allSameDiff) {
+    const d = diffs[0];
+    const sign = d >= 0 ? "+" : "";
+    const word = d >= 0 ? "plus" : "minus";
+    let arrows = "";
+    for (let i = 0; i < seqWithAnswer.length; i++) {
+      const isLast = i === seqWithAnswer.length - 1;
+      arrows += `<span class="chalk-arrow-num ${isLast ? 'unknown' : ''}">${seqWithAnswer[i]}</span>`;
+      if (i < seqWithAnswer.length - 1) {
+        arrows += `<span class="chalk-arrow-label"><span class="arrow-line">→</span><span class="chalk-green">${sign}${d}</span></span>`;
+      }
+    }
+    const jumpEmoji = d > 0 ? "🐸" : "🦘";
+    return `
+      <div class="chalk-title chalk-text chalk-write">${sign}${d} ${sign}${d} ${sign}${d}</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="${seqStr}. See the pattern? We jump ${word} ${Math.abs(d)} every time!">
+        <div class="chalk-arrow-row chalk-write-slow">${arrows}</div>
+      </div>
+      <div class="chalk-step" data-speak="${word} ${Math.abs(d)}!">
+        <div style="font-size:40px">${jumpEmoji}</div>
+        <div class="chalk-text chalk-green chalk-write" style="font-size:22px">${sign}${d}</div>
+      </div>
+      <div class="chalk-step" data-speak="${seq[seq.length-1]} ${word} ${Math.abs(d)} equals ${ans}!">
+        <div class="chalk-equation chalk-write"><span>${seq[seq.length-1]}</span> <span class="chalk-op">${d>=0?"+":"−"}</span> <span>${Math.abs(d)}</span> <span class="chalk-op">=</span> <span class="chalk-ans">${ans}</span></div>
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  if (allDouble) {
+    let arrows = "";
+    for (let i = 0; i < seqWithAnswer.length; i++) {
+      const isLast = i === seqWithAnswer.length - 1;
+      arrows += `<span class="chalk-arrow-num ${isLast ? 'unknown' : ''}">${seqWithAnswer[i]}</span>`;
+      if (i < seqWithAnswer.length - 1) {
+        arrows += `<span class="chalk-arrow-label"><span class="arrow-line">→</span>×2</span>`;
+      }
+    }
+    return `
+      <div class="chalk-title chalk-text">×2 ×2 ×2</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="${seqStr}. Each number doubles!">
+        <div class="chalk-arrow-row chalk-write-slow">${arrows}</div>
+      </div>
+      <div class="chalk-step" data-speak="Times 2 every time!">
+        <div style="font-size:36px">🐰🐰</div>
+        <div class="chalk-text chalk-yellow chalk-write" style="font-size:20px">×2</div>
+      </div>
+      <div class="chalk-step" data-speak="${seq[seq.length-1]} times 2 is ${ans}!">
+        <div class="chalk-equation chalk-write"><span>${seq[seq.length-1]}</span> <span class="chalk-op">×</span> <span>2</span> <span class="chalk-op">=</span> <span class="chalk-ans">${ans}</span></div>
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  if (isFib && seq.length >= 3) {
+    const s1 = seq[seq.length - 2], s2 = seq[seq.length - 1];
+    return `
+      <div class="chalk-title chalk-text">➕ ➕</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="${seqStr}, what comes next?">
+        <div class="chalk-arrow-row chalk-write-slow">${seq.map(n => `<span class="chalk-arrow-num">${n}</span>`).join('<span class="chalk-arrow-label"><span class="arrow-line">,</span></span>')}<span class="chalk-arrow-num unknown">❓</span></div>
+      </div>
+      <div class="chalk-step" data-speak="Add the last two! ${s1} plus ${s2}">
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px">
+          <div class="chalk-bond-circle bottom" style="width:52px;height:52px;font-size:24px">${s1}</div>
+          <span class="chalk-plus-sign chalk-write" style="font-size:28px">+</span>
+          <div class="chalk-bond-circle bottom" style="width:52px;height:52px;font-size:24px">${s2}</div>
+        </div>
+      </div>
+      <div class="chalk-step" data-speak="${s1} plus ${s2} equals ${ans}!">
+        <div class="chalk-equation chalk-write"><span>${s1}</span> <span class="chalk-op">+</span> <span>${s2}</span> <span class="chalk-op">=</span> <span class="chalk-ans">${ans}</span></div>
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  // Fallback
+  let arrows = "";
+  for (let i = 0; i < seq.length; i++) {
+    arrows += `<span class="chalk-arrow-num">${seq[i]}</span>`;
+    if (i < seq.length - 1) {
+      const d = diffs[i];
+      arrows += `<span class="chalk-arrow-label"><span class="arrow-line">→</span>${d>=0?"+":""}${d}</span>`;
+    }
+  }
+  arrows += `<span class="chalk-arrow-label"><span class="arrow-line">→</span>?</span><span class="chalk-arrow-num unknown">${ans}</span>`;
+  return `
+    <div class="chalk-title chalk-text">🔢 ❓</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="${seqStr}, what comes next?"><div class="chalk-arrow-row chalk-write-slow">${arrows}</div></div>
+    <div class="chalk-step" data-speak="It's ${ans}!">
+      <div class="chalk-big-num chalk-write">${ans}</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+</script>
+</body>
+</html>
