@@ -68,7 +68,7 @@
   .btn-mode .icon { font-size: 32px; }
   .btn-math   { background: #6366f1; }
   .btn-verbal { background: #10b981; }
-  .btn-chess  { background: #334155; }
+
   .btn-board  { background: #f59e0b; color: #78350f; }
 
   .btn-answer {
@@ -148,6 +148,14 @@
   }
   .group-box:hover { background: #ddd6fe; transform: scale(1.05); }
 
+  /* ── story passage ── */
+  .story-passage {
+    background: var(--accent-l); border: 2px solid var(--accent-m);
+    border-radius: 14px; padding: 16px 20px; margin: 10px 0;
+    font-size: 18px; line-height: 1.6; text-align: left;
+    font-family: 'Nunito', sans-serif; color: var(--text);
+  }
+
   /* ── score bar ── */
   .score-bar {
     display: flex; gap: 20px; justify-content: center;
@@ -185,42 +193,6 @@
     animation: conffall 1.2s ease-in forwards; }
   @keyframes conffall {
     to { transform: translateY(110vh) rotate(720deg); opacity:0; }
-  }
-
-  /* ── chess board ── */
-  .chess-board {
-    display: grid; grid-template-columns: repeat(5,48px); grid-template-rows: repeat(5,48px);
-    gap: 0; margin: 16px auto; width: fit-content; border: 3px solid #ec4899;
-    border-radius: 8px; overflow: hidden; box-shadow: 0 4px 16px rgba(236,72,153,.25);
-  }
-  .chess-cell {
-    width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
-    font-size: 28px; position: relative; transition: background .3s;
-  }
-  .chess-cell.light { background: #fff; }
-  .chess-cell.dark  { background: #fbcfe8; }
-  [data-theme="dark"] .chess-cell.light { background: #1e293b; }
-  [data-theme="dark"] .chess-cell.dark  { background: #0d9488; }
-  .chess-piece { font-size: 32px; z-index: 2; filter: drop-shadow(0 2px 3px rgba(0,0,0,.4)); }
-  .chess-highlight {
-    position: absolute; inset: 4px; border-radius: 50%;
-    background: rgba(132,204,22,.55); animation: chessPulse 1s ease-in-out infinite alternate;
-    box-shadow: 0 0 8px rgba(132,204,22,.5);
-  }
-  [data-theme="dark"] .chess-highlight {
-    background: rgba(250,204,21,.5);
-    box-shadow: 0 0 10px rgba(250,204,21,.5);
-  }
-  .chess-path {
-    position: absolute; inset: 4px; border-radius: 4px;
-    background: rgba(249,115,22,.45); animation: chessPulse 1s ease-in-out infinite alternate;
-  }
-  [data-theme="dark"] .chess-path {
-    background: rgba(251,191,36,.45);
-  }
-  @keyframes chessPulse {
-    from { opacity: .3; transform: scale(.85); }
-    to   { opacity: 1; transform: scale(1); }
   }
 
   /* ── chalkboard tutorial ── */
@@ -555,9 +527,6 @@
     <button class="btn-mode btn-verbal" onclick="startMode('verbal')">
       <span class="icon">📖</span> Words
     </button>
-    <button class="btn-mode btn-chess" onclick="startMode('chess')">
-      <span class="icon">♟</span> Chess
-    </button>
   </div>
 </div>
 
@@ -692,10 +661,8 @@ function renderQuestion() {
 
   if(q.type === "addition" || q.type === "subtraction") {
     currentCorrect = String(q.answer);
-    const learnBtn = q.type === "addition" ? `<button class="btn-learn" onclick="showTutorial()">💡 How to solve</button>` : "";
     area.innerHTML = `
       <p class="q-text" style="font-size:36px;font-family:'Fredoka One',cursive;color:var(--purple)">${esc(q.display)}</p>
-      ${learnBtn}
       <div class="opt-row">${makeArithOpts(q.answer, q.id)}</div>`;
 
   } else if(q.type === "number_order") {
@@ -722,7 +689,6 @@ function renderQuestion() {
     area.innerHTML = `
       <p class="q-text">What comes next? 🔢</p>
       <p style="font-size:32px;margin:12px 0;font-family:'Fredoka One',cursive;color:var(--purple)">${esc(q.display)}</p>
-      <button class="btn-learn" onclick="showTutorial()">💡 How to solve</button>
       <div class="opt-row">${makePatternOpts(q.answer, q.id)}</div>`;
 
   } else if(q.type === "shape") {
@@ -754,6 +720,49 @@ function renderQuestion() {
         <span style="font-size:28px;font-family:'Fredoka One',cursive;color:var(--purple)">or</span>
         <div class="group-box" onclick="checkAnswer('right','${q.answer}','${q.id}')">${q.right}</div>
       </div>`;
+
+  } else if(q.type === "measurement") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <p class="q-text">${esc(q.question)}</p>
+      <div class="group-row">
+        <div class="group-box" onclick="checkAnswer('left','${q.answer}','${q.id}')">
+          <div style="font-size:56px">${q.emoji_left}</div>
+          <div style="font-size:16px;margin-top:4px;font-weight:700">${esc(q.label_left)}</div>
+        </div>
+        <span style="font-size:28px;font-family:'Fredoka One',cursive;color:var(--purple)">or</span>
+        <div class="group-box" onclick="checkAnswer('right','${q.answer}','${q.id}')">
+          <div style="font-size:56px">${q.emoji_right}</div>
+          <div style="font-size:16px;margin-top:4px;font-weight:700">${esc(q.label_right)}</div>
+        </div>
+      </div>`;
+
+  } else if(q.type === "positional") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <div style="font-size:64px;margin:12px 0;line-height:1.3;white-space:pre-line">${q.scene}</div>
+      <p class="q-text">${esc(q.question)}</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:18px;padding:14px 20px">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "time") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <div style="font-size:64px;margin:8px 0">${q.emoji}</div>
+      <p class="q-text">${esc(q.question)}</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:18px;padding:14px 20px">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "money") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <div style="font-size:64px;margin:8px 0">${q.emoji}</div>
+      <p class="q-text">${esc(q.question)}</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:16px;padding:14px 18px">${esc(o)}</button>`
+      ).join("")}</div>`;
 
   } else if(q.type === "rhyme") {
     currentCorrect = q.answer;
@@ -815,24 +824,6 @@ function renderQuestion() {
         `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:20px;padding:14px 20px;text-transform:capitalize">${esc(o)}</button>`
       ).join("")}</div>`;
 
-  } else if(q.type === "chess") {
-    currentCorrect = q.answer;
-    area.innerHTML = `
-      <div id="chessBoard" class="chess-board">${buildChessBoard(q.piece, q.animation)}</div>
-      <p class="q-text">${q.emoji} ${esc(q.question)}</p>
-      <div class="opt-row">${q.options.map(o=>
-        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:18px;padding:14px 20px">${esc(o)}</button>`
-      ).join("")}</div>`;
-
-  } else if(q.type === "letter") {
-    currentCorrect = q.answer;
-    area.innerHTML = `
-      <div style="font-size:72px;margin:8px 0">${q.emoji}</div>
-      <p class="q-text">${esc(q.question)}</p>
-      <div class="opt-row">${q.options.map(o=>
-        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:28px;padding:16px 24px;font-weight:800">${esc(o)}</button>`
-      ).join("")}</div>`;
-
   } else if(q.type === "color") {
     currentCorrect = q.answer;
     area.innerHTML = `
@@ -841,9 +832,40 @@ function renderQuestion() {
       <div class="opt-row">${q.options.map(o=>
         `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:20px;padding:14px 20px">${esc(o)}</button>`
       ).join("")}</div>`;
+
+  } else if(q.type === "phonics") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <div style="font-size:64px;margin:8px 0">${q.emoji}</div>
+      <p class="q-text">${esc(q.question)}</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:20px;padding:14px 20px">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "digraph") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <div style="font-size:64px;margin:8px 0">${q.emoji}</div>
+      <p style="font-size:48px;font-family:'Fredoka One',cursive;color:var(--purple);margin:8px 0">${esc(q.display)}</p>
+      <p class="q-text">${esc(q.question)}</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:16px;padding:14px 18px">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "story") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <div style="font-size:48px;margin:4px 0">${q.emoji}</div>
+      <div class="story-passage">${esc(q.passage)}</div>
+      <p class="q-text">${esc(q.question)}</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:18px;padding:14px 20px">${esc(o)}</button>`
+      ).join("")}</div>`;
   }
 
   // Add skip button to every question
+  // Add learn button to every question type
+  area.innerHTML += `<button class="btn-learn" onclick="showTutorial()">💡 How to solve</button>`;
   area.innerHTML += `<button class="btn-skip" onclick="skipQuestion()">Skip ⏭️</button>`;
 }
 
@@ -872,80 +894,18 @@ function makePatternOpts(answer, qid) {
   ).join("");
 }
 
-// ── chess board builder ──────────────────────────────────────────────────
-function buildChessBoard(piece, animation) {
-  const center = 12; // center of 5x5 grid (index 12 = row 2, col 2)
-  const pieceEmojis = {king:"♚", queen:"♛", rook:"♜", bishop:"♝", knight:"♞", pawn:"♟"};
-  const emoji = pieceEmojis[piece] || "♟";
-
-  // Calculate valid move squares relative to center (row 2, col 2) on 5x5
-  const highlights = new Set();
-  const paths = new Set();
-
-  if(animation === "king") {
-    // All 8 surrounding squares
-    [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]].forEach(([dr,dc])=>{
-      const r=2+dr, c=2+dc;
-      if(r>=0&&r<5&&c>=0&&c<5) highlights.add(r*5+c);
-    });
-  } else if(animation === "queen") {
-    // All 8 directions
-    for(let d of [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]) {
-      for(let s=1;s<3;s++) {
-        const r=2+d[0]*s, c=2+d[1]*s;
-        if(r>=0&&r<5&&c>=0&&c<5) highlights.add(r*5+c);
-      }
-    }
-  } else if(animation === "rook") {
-    // Horizontal + vertical from center
-    for(let i=0;i<5;i++) { if(i!==2) { highlights.add(2*5+i); highlights.add(i*5+2); } }
-  } else if(animation === "bishop") {
-    // Diagonals from center
-    for(let s=-2;s<=2;s++) {
-      if(s===0) continue;
-      let r1=2+s, c1=2+s, r2=2+s, c2=2-s;
-      if(r1>=0&&r1<5&&c1>=0&&c1<5) highlights.add(r1*5+c1);
-      if(r2>=0&&r2<5&&c2>=0&&c2<5) highlights.add(r2*5+c2);
-    }
-  } else if(animation === "knight") {
-    // L-shaped moves
-    [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]].forEach(([dr,dc])=>{
-      const r=2+dr, c=2+dc;
-      if(r>=0&&r<5&&c>=0&&c<5) highlights.add(r*5+c);
-    });
-    // Show L-path for one move (up 2, right 1)
-    paths.add(1*5+2); // intermediate step
-  } else if(animation === "pawn") {
-    // Forward 1 and 2 squares (up from center)
-    highlights.add(1*5+2);
-    highlights.add(0*5+2);
-  }
-
-  let html = "";
-  for(let i=0;i<25;i++) {
-    const r = Math.floor(i/5), c = i%5;
-    const shade = (r+c)%2===0 ? "light" : "dark";
-    let inner = "";
-    if(i === center) inner = `<span class="chess-piece">${emoji}</span>`;
-    else if(highlights.has(i)) inner = `<span class="chess-highlight" style="animation-delay:${(i%5)*0.12}s"></span>`;
-    if(paths.has(i)) inner += `<span class="chess-path" style="animation-delay:${(i%5)*0.08}s"></span>`;
-    html += `<div class="chess-cell ${shade}">${inner}</div>`;
-  }
-  return html;
-}
-
 // ── check answer (with hint on first wrong, reveal on second) ─────────────
 async function checkAnswer(given, correct, qid) {
   const isOk = String(given) === String(correct);
   const mode = questions._mode;
 
   if(!isOk && wrongCount === 0) {
-    // First wrong: show hint + try again
+    // First wrong: auto-open tutorial to teach the method
     wrongCount = 1;
     document.querySelectorAll("#questionArea button, #questionArea .group-box").forEach(b=>b.style.pointerEvents="none");
 
     const fb = document.getElementById("feedback");
-    fb.textContent = "Not quite! 🤔";
+    fb.textContent = "Let's learn how! 📖";
     fb.className = "feedback bad";
     playSound("wrong");
 
@@ -956,11 +916,11 @@ async function checkAnswer(given, correct, qid) {
       body: JSON.stringify({player_name: playerName, mode, question_id: qid, correct: false})
     });
 
-    // Show hint and retry button
-    const area = document.getElementById("questionArea");
-    area.innerHTML += `
-      <div class="hint-box">💡 Hint: ${esc(currentHint)}</div>
-      <button class="btn-retry" onclick="retryQuestion()">Try again! 💪</button>`;
+    // Auto-open chalkboard tutorial after brief pause
+    setTimeout(() => {
+      _tutorialAutoRetry = true;
+      showTutorial();
+    }, 800);
     return;
   }
 
@@ -989,9 +949,12 @@ async function checkAnswer(given, correct, qid) {
     fb.textContent = `The answer is: ${currentCorrect}`;
     fb.className = "feedback bad";
     playSound("wrong");
+    // Add "Learn why" button for optional re-study
+    const area = document.getElementById("questionArea");
+    area.innerHTML += `<button class="btn-learn" onclick="showTutorial()" style="margin-top:8px">📖 Learn why</button>`;
   }
 
-  setTimeout(()=>{ qIndex++; renderQuestion(); }, 2000);
+  setTimeout(()=>{ qIndex++; renderQuestion(); }, 3000);
 }
 
 // ── retry after hint ──────────────────────────────────────────────────────
@@ -1030,7 +993,7 @@ async function showBoard() {
   pa.innerHTML = `<h3 style="font-family:'Fredoka One',cursive;color:var(--purple);margin-bottom:8px">${esc(playerName)}'s Progress</h3>`;
   for(const [mode, stat] of Object.entries(prData.progress||{})) {
     const pct = stat.total ? Math.round(stat.correct/stat.total*100) : 0;
-    const modeLabel = mode === "math" ? "🍎 Math" : mode === "chess" ? "♟ Chess" : "📖 Words";
+    const modeLabel = mode === "math" ? "🍎 Math" : "📖 Words";
     pa.innerHTML += `
       <div class="progress-block">
         <h3>${modeLabel} — ${stat.correct}/${stat.total} (${pct}%)</h3>
@@ -1114,6 +1077,7 @@ function confetti(count=20) {
 
 // ── chalkboard tutorials ────────────────────────────────────────────────
 let _tutorialInterval = null;
+let _tutorialAutoRetry = false;
 
 // Spawn chalk dust particles near the board
 function spawnChalkDust(container, count) {
@@ -1191,16 +1155,39 @@ function chalkSpeak(text) {
   speechSynthesis.speak(utter);
 }
 
+// Tutorial builder dispatch map — every question type gets a tutorial
+const tutorialBuilders = {
+  addition: buildTutorialAddition,
+  subtraction: buildTutorialSubtraction,
+  pattern: buildTutorialPattern,
+  shape: buildTutorialShape,
+  number_order: buildTutorialNumberOrder,
+  bigger: buildTutorialBigger,
+  more_less: buildTutorialMoreLess,
+  sorting: buildTutorialSorting,
+  measurement: buildTutorialMeasurement,
+  positional: buildTutorialPositional,
+  time: buildTutorialTime,
+  money: buildTutorialMoney,
+  phonics: buildTutorialPhonics,
+  digraph: buildTutorialDigraph,
+  spelling: buildTutorialSpelling,
+  rhyme: buildTutorialRhyme,
+  sight_word: buildTutorialSightWord,
+  sentence: buildTutorialSentence,
+  story: buildTutorialStory,
+  word: buildTutorialWord,
+  sound: buildTutorialSound,
+  opposite: buildTutorialOpposite,
+  color: buildTutorialColor
+};
+
 function showTutorial() {
   const q = questions[qIndex];
   const el = document.getElementById("chalkContent");
-  if (q.type === "addition") {
-    el.innerHTML = buildTutorialAddition(q);
-  } else if (q.type === "pattern") {
-    el.innerHTML = buildTutorialPattern(q);
-  } else {
-    return;
-  }
+  const builder = tutorialBuilders[q.type];
+  if (!builder) return;
+  el.innerHTML = builder(q);
   const overlay = document.getElementById("chalkOverlay");
   overlay.classList.remove("hidden");
 
@@ -1246,6 +1233,636 @@ function closeTutorial() {
   document.getElementById("chalkOverlay").classList.add("hidden");
   if (_tutorialInterval) { clearInterval(_tutorialInterval); _tutorialInterval = null; }
   if (window.speechSynthesis) speechSynthesis.cancel();
+  // If auto-opened on wrong answer, re-render question for retry
+  if (_tutorialAutoRetry) {
+    _tutorialAutoRetry = false;
+    retryQuestion();
+  }
+}
+
+// ── Reusable components ─────────────────────────────────────────────────
+
+function buildTenFrame(n) {
+  let html = '<div class="chalk-ten-frame">';
+  for (let i = 0; i < 10; i++) {
+    const filled = i < n;
+    html += `<div class="chalk-ten-cell ${filled ? 'filled' : ''}">${filled ? '●' : ''}</div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+const JOLLY_PHONICS = {
+  b: { action: "Pretend to hit a ball with a bat!", emoji: "⚾", words: ["Ball","Bear","Bus"] },
+  d: { action: "Play a drum! d-d-d-d!", emoji: "🥁", words: ["Dog","Door","Duck"] },
+  f: { action: "Let the air out of a tire! ffff!", emoji: "🌬️", words: ["Fish","Frog","Fun"] },
+  g: { action: "Spiral water going down the drain! g-g-g!", emoji: "🌀", words: ["Go","Girl","Grapes"] },
+  k: { action: "Crack an egg on the edge! k-k-k!", emoji: "🥚", words: ["King","Kite","Key"] },
+  m: { action: "Rub your tummy — yummy! mmm!", emoji: "😋", words: ["Mom","Moon","Milk"] },
+  n: { action: "Airplane noise! nnnn!", emoji: "✈️", words: ["Nose","Net","Nut"] },
+  p: { action: "Pop a bubble! p-p-p!", emoji: "🫧", words: ["Pig","Pop","Pan"] },
+  s: { action: "Weave your hand like a snake! sssss!", emoji: "🐍", words: ["Snake","Sun","Star"] },
+  t: { action: "Turn your head side to side! t-t-t!", emoji: "⏰", words: ["Top","Toy","Ten"] }
+};
+
+// ── Subtraction tutorial builders ───────────────────────────────────────
+
+function buildTutorialSubtraction(q) {
+  const a = q.a, b = q.b, ans = q.answer;
+  const method = q.method || "count_back";
+  const eA = "🍎";
+
+  function eq(a, op, b, result) {
+    const parts = [`${a}`, ` ${op} `, `${b}`, ` = `, `${result}`];
+    const classes = ['', 'chalk-op', '', 'chalk-op', 'chalk-ans'];
+    let html = '', delay = 0;
+    parts.forEach((part, pi) => {
+      for (const ch of part) {
+        if (ch === ' ') { html += ' '; continue; }
+        html += `<span class="chalk-char ${classes[pi]}" style="animation-delay:${delay.toFixed(2)}s">${ch}</span>`;
+        delay += 0.18;
+      }
+    });
+    return `<div class="chalk-equation">${html}</div>`;
+  }
+
+  if (method === "count_back") {
+    const start = Math.min(a + 1, a), end = Math.max(0, ans - 1);
+    let ticks = "";
+    for (let n = end; n <= start; n++) {
+      const cls = n === a ? "active" : n === ans ? "landed" : "";
+      ticks += `<div class="chalk-tick ${cls}">${n}</div>`;
+    }
+    let hops = "";
+    for (let n = end; n <= start; n++) {
+      hops += `<div class="chalk-hop-cell">${(n >= ans && n < a) ? "⌒" : ""}</div>`;
+    }
+    const countWords = Array.from({length: b}, (_, i) => a - i - 1).join(", ");
+    return `
+      <div class="chalk-title chalk-text">🔢 🐸</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="We start at ${a}">
+        <div class="chalk-big-num chalk-write">${a}</div>
+        <div class="chalk-big-emoji">${makeEmoji(Math.min(a, 12), eA)}</div>
+      </div>
+      <div class="chalk-step" data-speak="Now hop BACK ${b} times! ${countWords}!">
+        <div class="chalk-big-emoji" style="font-size:36px">${"🐸 ".repeat(b)}</div>
+        <div class="chalk-hop-row chalk-write">${hops}</div>
+        <div class="chalk-number-line chalk-write-slow">${ticks}</div>
+      </div>
+      <div class="chalk-step" data-speak="${a} minus ${b} equals ${ans}!">
+        ${eq(a, "−", b, ans)}
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  if (method === "number_bonds") {
+    return `
+      <div class="chalk-title chalk-text">🔗 Find the missing part!</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="The whole is ${a}. One part is ${b}. What is the missing part?">
+        <div class="chalk-bond">
+          <div class="chalk-bond-circle top">${a}</div>
+          <svg class="chalk-bond-arms-svg" width="140" height="40" viewBox="0 0 140 40">
+            <line class="chalk-svg-line" x1="50" y1="4" x2="20" y2="36" stroke="rgba(255,255,255,.5)" stroke-width="2.5"/>
+            <line class="chalk-svg-line" x1="90" y1="4" x2="120" y2="36" stroke="rgba(255,255,255,.5)" stroke-width="2.5" style="animation-delay:.3s"/>
+          </svg>
+          <div style="display:flex;justify-content:center;gap:40px">
+            <div class="chalk-bond-circle bottom">${b}</div>
+            <div class="chalk-bond-circle bottom chalk-green">?</div>
+          </div>
+        </div>
+      </div>
+      <div class="chalk-step" data-speak="${b} and ${ans} make ${a}! So the missing part is ${ans}!">
+        <div class="chalk-bond">
+          <div class="chalk-bond-circle top">${a}</div>
+          <svg class="chalk-bond-arms-svg" width="140" height="40" viewBox="0 0 140 40">
+            <line class="chalk-svg-line" x1="50" y1="4" x2="20" y2="36" stroke="rgba(255,255,255,.5)" stroke-width="2.5"/>
+            <line class="chalk-svg-line" x1="90" y1="4" x2="120" y2="36" stroke="rgba(255,255,255,.5)" stroke-width="2.5"/>
+          </svg>
+          <div style="display:flex;justify-content:center;gap:40px">
+            <div class="chalk-bond-circle bottom">${b}</div>
+            <div class="chalk-bond-circle bottom chalk-green">${ans}</div>
+          </div>
+        </div>
+      </div>
+      <div class="chalk-step" data-speak="${a} minus ${b} equals ${ans}!">
+        ${eq(a, "−", b, ans)}
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  if (method === "bridge_10") {
+    const toTen = a - 10;
+    const remainder = b - toTen;
+    return `
+      <div class="chalk-title chalk-text">🌉 Bridge through 10!</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="Start at ${a}. First hop to 10!">
+        <div class="chalk-text chalk-yellow chalk-write" style="font-size:24px">${a} − ${toTen} = 10</div>
+        ${buildTenFrame(10)}
+      </div>
+      <div class="chalk-step" data-speak="Now subtract ${remainder} more from 10!">
+        <div class="chalk-text chalk-yellow chalk-write" style="font-size:24px">10 − ${remainder} = ${ans}</div>
+        ${buildTenFrame(ans)}
+      </div>
+      <div class="chalk-step" data-speak="${a} minus ${b} equals ${ans}!">
+        ${eq(a, "−", b, ans)}
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  if (method === "doubles") {
+    return `
+      <div class="chalk-title chalk-text">🪞</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="Double ${ans} is ${a}! ${ans} plus ${ans} equals ${a}">
+        <div style="display:flex;align-items:center;justify-content:center;gap:16px">
+          <div class="chalk-big-emoji">${makeEmoji(Math.min(ans, 8), eA)}</div>
+          <span class="chalk-divider">|</span>
+          <div class="chalk-big-emoji">${makeEmoji(Math.min(ans, 8), eA)}</div>
+        </div>
+        <div class="chalk-text chalk-yellow chalk-write" style="font-size:24px;margin-top:6px">${ans} 🪞 ${ans} = ${a}</div>
+      </div>
+      <div class="chalk-step" data-speak="Take away one side! ${a} minus ${b} equals ${ans}!">
+        <div style="display:flex;align-items:center;justify-content:center;gap:16px">
+          <div class="chalk-big-emoji">${makeEmoji(Math.min(ans, 8), eA)}</div>
+          <span class="chalk-divider">|</span>
+          <div class="chalk-big-emoji" style="opacity:0.2;text-decoration:line-through">${makeEmoji(Math.min(b, 8), eA)}</div>
+        </div>
+      </div>
+      <div class="chalk-step" data-speak="${a} minus ${b} equals ${ans}!">
+        ${eq(a, "−", b, ans)}
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  // Fallback
+  return `
+    <div class="chalk-title chalk-text">➖</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="We have ${a}">
+      <div class="chalk-big-emoji">${makeEmoji(Math.min(a, 15), eA)}</div>
+      <div class="chalk-big-num chalk-write">${a}</div>
+    </div>
+    <div class="chalk-step" data-speak="Take away ${b}">
+      <div class="chalk-text chalk-pink chalk-write" style="font-size:24px">Take away ${b}!</div>
+      <div class="chalk-big-emoji" style="opacity:0.3">${makeEmoji(Math.min(b, 15), eA)}</div>
+    </div>
+    <div class="chalk-step" data-speak="${a} minus ${b} equals ${ans}!">
+      ${eq(a, "−", b, ans)}
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Shape tutorial ──────────────────────────────────────────────────────
+function buildTutorialShape(q) {
+  const shapes3d = { sphere: "round in EVERY direction like a ball", cube: "like a box with 6 flat faces", cylinder: "like a can — two circles and a tube", cone: "pointy on top, round on the bottom" };
+  const shapes2d = { triangle: "3 sides and 3 corners", circle: "perfectly round, no corners", square: "4 equal sides and 4 square corners", rectangle: "4 sides — 2 long and 2 short", oval: "like a stretched circle", diamond: "4 sides, standing on a point" };
+  const info = shapes3d[q.answer] || shapes2d[q.answer] || q.description;
+  const is3d = !!shapes3d[q.answer];
+  return `
+    <div class="chalk-title chalk-text">${q.emoji}</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="${q.description}">
+      <div style="font-size:64px">${q.emoji}</div>
+      <div class="chalk-text chalk-write" style="font-size:20px;margin-top:8px">${esc(q.description)}</div>
+    </div>
+    <div class="chalk-step" data-speak="A ${q.answer} ${is3d ? 'is a 3D shape — ' : 'has '}${info}!">
+      <div class="chalk-text chalk-yellow chalk-write" style="font-size:22px">${is3d ? '3D Shape!' : ''} ${esc(info)}</div>
+    </div>
+    <div class="chalk-step" data-speak="It's a ${q.answer}!">
+      <div class="chalk-text chalk-green chalk-write" style="font-size:32px;text-transform:capitalize">${q.answer}!</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Number Order tutorial ───────────────────────────────────────────────
+function buildTutorialNumberOrder(q) {
+  const ans = q.answer;
+  const nums = [];
+  for (let n = Math.max(0, ans - 3); n <= ans + 3; n++) nums.push(n);
+  const ticks = nums.map(n => `<div class="chalk-tick ${n === ans ? 'landed' : ''}">${n}</div>`).join("");
+  return `
+    <div class="chalk-title chalk-text">🔢</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="${q.question}">
+      <div class="chalk-text chalk-write" style="font-size:22px">${esc(q.question)}</div>
+    </div>
+    <div class="chalk-step" data-speak="Look at the number line!">
+      <div class="chalk-number-line chalk-write-slow">${ticks}</div>
+    </div>
+    <div class="chalk-step" data-speak="The answer is ${ans}!">
+      <div class="chalk-big-num chalk-write chalk-green">${ans}</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Bigger tutorial ─────────────────────────────────────────────────────
+function buildTutorialBigger(q) {
+  const bigger = Math.max(q.a, q.b);
+  const smaller = Math.min(q.a, q.b);
+  return `
+    <div class="chalk-title chalk-text">📏 Which is bigger?</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="Let's compare ${q.a} and ${q.b}">
+      <div style="display:flex;align-items:center;justify-content:center;gap:24px">
+        <div>${buildTenFrame(Math.min(q.a, 10))}<div class="chalk-text chalk-yellow chalk-write" style="font-size:28px;margin-top:6px">${q.a}</div></div>
+        <div class="chalk-text chalk-write" style="font-size:28px">vs</div>
+        <div>${buildTenFrame(Math.min(q.b, 10))}<div class="chalk-text chalk-yellow chalk-write" style="font-size:28px;margin-top:6px">${q.b}</div></div>
+      </div>
+    </div>
+    <div class="chalk-step" data-speak="${bigger} has more! ${bigger} is bigger than ${smaller}!">
+      <div class="chalk-text chalk-green chalk-write" style="font-size:32px">${bigger} > ${smaller}</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── More/Less tutorial ──────────────────────────────────────────────────
+function buildTutorialMoreLess(q) {
+  const leftCount = [...q.left].filter(c => c.match(/\p{Emoji_Presentation}/u)).length || q.left.length;
+  const rightCount = [...q.right].filter(c => c.match(/\p{Emoji_Presentation}/u)).length || q.right.length;
+  const isMore = q.question.toLowerCase().includes("more");
+  return `
+    <div class="chalk-title chalk-text">${isMore ? '📈' : '📉'}</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="Let's count each group!">
+      <div style="display:flex;align-items:center;justify-content:center;gap:20px">
+        <div><div style="font-size:28px">${q.left}</div><div class="chalk-text chalk-yellow chalk-write" style="font-size:24px">${leftCount}</div></div>
+        <div class="chalk-text chalk-write" style="font-size:24px">vs</div>
+        <div><div style="font-size:28px">${q.right}</div><div class="chalk-text chalk-yellow chalk-write" style="font-size:24px">${rightCount}</div></div>
+      </div>
+    </div>
+    <div class="chalk-step" data-speak="The ${q.answer} side has ${isMore ? 'more' : 'fewer'}!">
+      <div class="chalk-text chalk-green chalk-write" style="font-size:28px">${q.answer === 'left' ? '⬅️' : '➡️'} ${isMore ? 'More' : 'Fewer'}!</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Sorting tutorial ────────────────────────────────────────────────────
+function buildTutorialSorting(q) {
+  const others = q.items.filter(i => i !== q.answer);
+  return `
+    <div class="chalk-title chalk-text">🔍 Odd one out!</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="Look at all the items">
+      <div style="font-size:40px;display:flex;gap:12px;justify-content:center">${q.items.map(i => `<span>${i}</span>`).join("")}</div>
+    </div>
+    <div class="chalk-step" data-speak="These three go together!">
+      <div style="font-size:40px;display:flex;gap:12px;justify-content:center">${others.map(i => `<span>✅ ${i}</span>`).join("")}</div>
+      <div style="font-size:40px;margin-top:8px">❌ ${q.answer}</div>
+    </div>
+    <div class="chalk-step" data-speak="${q.answer} doesn't belong! ${q.hint}">
+      <div class="chalk-text chalk-yellow chalk-write" style="font-size:20px">${esc(q.hint)}</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Measurement tutorial ────────────────────────────────────────────────
+function buildTutorialMeasurement(q) {
+  const winLabel = q.answer === "left" ? q.label_left : q.label_right;
+  const winEmoji = q.answer === "left" ? q.emoji_left : q.emoji_right;
+  return `
+    <div class="chalk-title chalk-text">📏</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="${q.question}">
+      <div style="display:flex;align-items:center;justify-content:center;gap:24px">
+        <div><div style="font-size:56px">${q.emoji_left}</div><div class="chalk-text chalk-write" style="font-size:18px">${esc(q.label_left)}</div></div>
+        <div class="chalk-text chalk-write" style="font-size:24px">vs</div>
+        <div><div style="font-size:56px">${q.emoji_right}</div><div class="chalk-text chalk-write" style="font-size:18px">${esc(q.label_right)}</div></div>
+      </div>
+    </div>
+    <div class="chalk-step" data-speak="${q.hint}">
+      <div class="chalk-text chalk-yellow chalk-write" style="font-size:20px">${esc(q.hint)}</div>
+    </div>
+    <div class="chalk-step" data-speak="The ${winLabel} is ${q.attribute}!">
+      <div style="font-size:64px">${winEmoji}</div>
+      <div class="chalk-text chalk-green chalk-write" style="font-size:28px">${esc(winLabel)} is ${q.attribute}!</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Positional tutorial ─────────────────────────────────────────────────
+function buildTutorialPositional(q) {
+  return `
+    <div class="chalk-title chalk-text">📍</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="Look at the picture!">
+      <div style="font-size:64px;white-space:pre-line">${q.scene}</div>
+    </div>
+    <div class="chalk-step" data-speak="${q.hint}">
+      <div class="chalk-text chalk-yellow chalk-write" style="font-size:22px">${esc(q.hint)}</div>
+    </div>
+    <div class="chalk-step" data-speak="The answer is ${q.answer}!">
+      <div class="chalk-text chalk-green chalk-write" style="font-size:28px">${esc(q.answer)}</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Time tutorial ───────────────────────────────────────────────────────
+function buildTutorialTime(q) {
+  const segments = [
+    { label: "Morning", emoji: "🌅", active: q.answer === "Morning" },
+    { label: "Afternoon", emoji: "☀️", active: q.answer === "Afternoon" },
+    { label: "Night", emoji: "🌙", active: q.answer === "Night" }
+  ];
+  const timeline = segments.map(s =>
+    `<div style="text-align:center;padding:8px 12px;border-radius:8px;${s.active ? 'background:rgba(130,255,170,.2);border:2px solid rgba(130,255,170,.5)' : ''}">${s.emoji}<br><span class="chalk-text" style="font-size:14px">${s.label}</span></div>`
+  ).join('<span class="chalk-text" style="font-size:20px">→</span>');
+  return `
+    <div class="chalk-title chalk-text">🕐</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="${q.question}">
+      <div style="font-size:48px">${q.emoji}</div>
+      <div class="chalk-text chalk-write" style="font-size:20px">${esc(q.question)}</div>
+    </div>
+    <div class="chalk-step" data-speak="Let's look at the day! Morning, afternoon, and night.">
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px">${timeline}</div>
+    </div>
+    <div class="chalk-step" data-speak="${q.hint} The answer is ${q.answer}!">
+      <div class="chalk-text chalk-green chalk-write" style="font-size:28px">${q.answer}!</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Money tutorial ──────────────────────────────────────────────────────
+function buildTutorialMoney(q) {
+  return `
+    <div class="chalk-title chalk-text">🪙</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="${q.question}">
+      <div style="font-size:48px">🪙</div>
+      <div class="chalk-text chalk-write" style="font-size:20px">${esc(q.question)}</div>
+    </div>
+    <div class="chalk-step" data-speak="${q.hint}">
+      <div class="chalk-text chalk-yellow chalk-write" style="font-size:20px">${esc(q.hint)}</div>
+    </div>
+    <div class="chalk-step" data-speak="The answer is ${q.answer}!">
+      <div class="chalk-text chalk-green chalk-write" style="font-size:28px">${esc(q.answer)}</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Phonics tutorial ────────────────────────────────────────────────────
+function buildTutorialPhonics(q) {
+  if (q.subtype === "blending") {
+    const match = q.question.match(/:\s*(.+)/);
+    const letterStr = match ? match[1].trim() : "";
+    const letters = letterStr.split("-").map(l => l.trim());
+    return `
+      <div class="chalk-title chalk-text">🔤 Blend!</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="Let's sound out each letter. ${letters.join('... ')}">
+        <div style="display:flex;gap:32px;justify-content:center;font-size:48px;font-family:'Fredoka One',cursive" class="chalk-text chalk-write">
+          ${letters.map(l => `<span>${l}</span>`).join("")}
+        </div>
+        <div style="font-size:36px;margin-top:8px">🤖</div>
+      </div>
+      <div class="chalk-step" data-speak="Now push them together! ${q.answer}!">
+        <div style="display:flex;gap:4px;justify-content:center;font-size:48px;font-family:'Fredoka One',cursive" class="chalk-text chalk-green chalk-write">
+          ${letters.map(l => `<span>${l}</span>`).join("")}
+        </div>
+        <div class="chalk-text chalk-yellow chalk-write" style="font-size:28px;margin-top:8px">→ ${q.answer}!</div>
+      </div>
+      <div class="chalk-step" data-speak="${q.answer}! Great job!">
+        <div class="chalk-text chalk-green chalk-write" style="font-size:36px">${q.answer}! ${q.emoji || ''}</div>
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  const letter = q.answer.charAt(0).toLowerCase();
+  const jp = JOLLY_PHONICS[letter];
+  if (jp) {
+    return `
+      <div class="chalk-title chalk-text" style="font-size:64px">${letter.toUpperCase()}</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="This letter says ${q.answer}!">
+        <div class="chalk-text chalk-write" style="font-size:56px">${letter.toUpperCase()} ${letter}</div>
+        <div class="chalk-text chalk-yellow chalk-write" style="font-size:24px;margin-top:8px">says "${q.answer}"</div>
+      </div>
+      <div class="chalk-step" data-speak="${jp.action}">
+        <div style="font-size:48px">${jp.emoji}</div>
+        <div class="chalk-text chalk-pink chalk-write" style="font-size:20px">${esc(jp.action)}</div>
+      </div>
+      <div class="chalk-step" data-speak="${letter.toUpperCase()} is for ${jp.words.join(' and ')}!">
+        <div class="chalk-text chalk-green chalk-write" style="font-size:22px">${jp.words.map(w => `<span style="font-size:20px">${w}</span>`).join(" · ")}</div>
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  return `
+    <div class="chalk-title chalk-text" style="font-size:64px">${q.emoji}</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="${q.hint}">
+      <div class="chalk-text chalk-yellow chalk-write" style="font-size:22px">${esc(q.hint)}</div>
+    </div>
+    <div class="chalk-step" data-speak="The answer is ${q.answer}!">
+      <div class="chalk-text chalk-green chalk-write" style="font-size:32px">${esc(q.answer)}</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Digraph tutorial ────────────────────────────────────────────────────
+function buildTutorialDigraph(q) {
+  const letters = q.display ? q.display.split("") : ["?","?"];
+  const exampleWord = q.answer.includes("like") ? q.answer.split("like")[1].trim() : q.answer;
+  return `
+    <div class="chalk-title chalk-text">${q.emoji}</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="When ${letters[0].toUpperCase()} and ${letters[1].toUpperCase()} come together...">
+      <div style="display:flex;gap:16px;justify-content:center;align-items:center">
+        <span class="chalk-text chalk-write" style="font-size:48px">${letters[0]}</span>
+        <span class="chalk-text chalk-yellow chalk-write" style="font-size:24px">+</span>
+        <span class="chalk-text chalk-write" style="font-size:48px">${letters[1]}</span>
+      </div>
+    </div>
+    <div class="chalk-step" data-speak="They make the sound ${q.display}! Like ${exampleWord}!">
+      <div class="chalk-text chalk-green chalk-write" style="font-size:48px">${q.display}</div>
+      <div class="chalk-text chalk-yellow chalk-write" style="font-size:22px;margin-top:8px">like "${exampleWord}"!</div>
+    </div>
+    <div class="chalk-step" data-speak="${q.hint}">
+      <div class="chalk-text chalk-pink chalk-write" style="font-size:20px">${esc(q.hint)}</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Spelling tutorial ───────────────────────────────────────────────────
+function buildTutorialSpelling(q) {
+  const letters = q.word.split("");
+  return `
+    <div class="chalk-title chalk-text">${q.emoji}</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="Let's spell ${q.word}! Look at the picture.">
+      <div style="font-size:64px">${q.emoji}</div>
+      <div class="chalk-text chalk-write" style="font-size:28px">${esc(q.word)}</div>
+    </div>
+    <div class="chalk-step" data-speak="Sound it out! ${letters.join('... ')}">
+      <div style="display:flex;gap:16px;justify-content:center">
+        ${letters.map((l, i) => `<span class="chalk-text chalk-yellow chalk-write" style="font-size:40px;animation-delay:${i * 0.4}s">${l}</span>`).join("")}
+      </div>
+      <div class="chalk-text chalk-write" style="font-size:18px;margin-top:8px">${esc(q.hint)}</div>
+    </div>
+    <div class="chalk-step" data-speak="${q.word}! ${letters.join('-').toUpperCase()}!">
+      <div class="chalk-text chalk-green chalk-write" style="font-size:36px">${q.word.toUpperCase()}</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Rhyme tutorial ──────────────────────────────────────────────────────
+function buildTutorialRhyme(q) {
+  const ending = q.word.slice(-2);
+  const family = [q.word, q.answer, ...q.options.filter(o => o !== q.answer && o.endsWith(ending))].slice(0, 4);
+  return `
+    <div class="chalk-title chalk-text">${q.emoji} Rhyme Time!</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="What rhymes with ${q.word}? Words that end with the same sound!">
+      <div class="chalk-text chalk-write" style="font-size:32px">${esc(q.word)}</div>
+      <div class="chalk-text chalk-yellow chalk-write" style="font-size:20px;margin-top:6px">ending: <b>-${ending}</b></div>
+    </div>
+    <div class="chalk-step" data-speak="${q.answer} rhymes with ${q.word}! They both end with ${ending}!">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+        ${family.map(w => `<div class="chalk-text chalk-write" style="font-size:24px">${w.slice(0, -ending.length)}<span class="chalk-yellow">${ending}</span></div>`).join("")}
+      </div>
+    </div>
+    <div class="chalk-step" data-speak="${q.answer}! Great job!">
+      <div class="chalk-text chalk-green chalk-write" style="font-size:32px">${esc(q.answer)} rhymes with ${esc(q.word)}!</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Sight Word tutorial ─────────────────────────────────────────────────
+function buildTutorialSightWord(q) {
+  const letters = q.word.split("");
+  const sentences = { "I": "I am happy!", "a": "I see a dog!", "the": "The cat is big!", "is": "It is sunny!", "my": "This is my toy!", "it": "Look at it!", "on": "The cup is on the table!", "up": "Look up at the sky!", "go": "Ready, set, go!", "see": "I can see you!", "can": "I can do it!", "we": "We are friends!", "he": "He is fast!", "she": "She is kind!", "no": "No, thank you!" };
+  const sentence = sentences[q.word] || `I see ${q.word}!`;
+  return `
+    <div class="chalk-title chalk-text">${q.emoji}</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="This word is ${q.word}!">
+      <div class="chalk-text chalk-green chalk-write" style="font-size:56px">${esc(q.word)}</div>
+    </div>
+    <div class="chalk-step" data-speak="Spell it! ${letters.join(', ')}. ${q.word}!">
+      <div style="display:flex;gap:12px;justify-content:center">
+        ${letters.map((l, i) => `<span class="chalk-text chalk-yellow chalk-write" style="font-size:36px;animation-delay:${i * 0.3}s">${l.toUpperCase()}</span>`).join("")}
+      </div>
+    </div>
+    <div class="chalk-step" data-speak="${sentence}">
+      <div class="chalk-text chalk-write" style="font-size:22px">"${esc(sentence)}"</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Sentence tutorial ───────────────────────────────────────────────────
+function buildTutorialSentence(q) {
+  return `
+    <div class="chalk-title chalk-text">📝</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="Read the sentence. Something is missing!">
+      <div class="chalk-text chalk-write" style="font-size:22px">${esc(q.sentence)}</div>
+    </div>
+    <div class="chalk-step" data-speak="${q.hint}">
+      <div class="chalk-text chalk-yellow chalk-write" style="font-size:20px">💡 ${esc(q.hint)}</div>
+    </div>
+    <div class="chalk-step" data-speak="The missing word is ${q.answer}!">
+      <div class="chalk-text chalk-green chalk-write" style="font-size:32px">${esc(q.answer)}!</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Story tutorial ──────────────────────────────────────────────────────
+function buildTutorialStory(q) {
+  return `
+    <div class="chalk-title chalk-text">📖 Let's re-read!</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="${q.passage}">
+      <div class="chalk-text chalk-write" style="font-size:18px;text-align:left;line-height:1.6">${esc(q.passage)}</div>
+    </div>
+    <div class="chalk-step" data-speak="${q.question} ${q.hint}">
+      <div class="chalk-text chalk-yellow chalk-write" style="font-size:20px">${esc(q.question)}</div>
+      <div class="chalk-text chalk-pink chalk-write" style="font-size:18px;margin-top:6px">💡 ${esc(q.hint)}</div>
+    </div>
+    <div class="chalk-step" data-speak="The answer is ${q.answer}!">
+      <div class="chalk-text chalk-green chalk-write" style="font-size:32px">${esc(q.answer)}!</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Word tutorial ───────────────────────────────────────────────────────
+function buildTutorialWord(q) {
+  return `
+    <div class="chalk-title chalk-text">🖼️</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="${q.question}">
+      <div class="chalk-text chalk-write" style="font-size:22px">${esc(q.question)}</div>
+    </div>
+    <div class="chalk-step" data-speak="${q.hint}">
+      <div class="chalk-text chalk-yellow chalk-write" style="font-size:20px">💡 ${esc(q.hint)}</div>
+    </div>
+    <div class="chalk-step" data-speak="The answer is ${q.answer}!">
+      <div class="chalk-text chalk-green chalk-write" style="font-size:28px">${esc(q.answer)}</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Sound tutorial ──────────────────────────────────────────────────────
+function buildTutorialSound(q) {
+  return `
+    <div class="chalk-title chalk-text">${q.emoji}</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="${q.question}">
+      <div style="font-size:72px">${q.emoji}</div>
+    </div>
+    <div class="chalk-step" data-speak="It says ${q.answer}!">
+      <div style="font-size:56px">${q.emoji}</div>
+      <div class="chalk-text chalk-green chalk-write" style="font-size:36px;margin-top:8px">"${q.answer}!"</div>
+    </div>
+    <div class="chalk-step" data-speak="${q.hint}">
+      <div class="chalk-text chalk-yellow chalk-write" style="font-size:20px">${esc(q.hint)}</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Opposite tutorial ───────────────────────────────────────────────────
+function buildTutorialOpposite(q) {
+  return `
+    <div class="chalk-title chalk-text">↔️ Opposites!</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="What is the opposite of ${q.word}?">
+      <div style="font-size:56px">${q.emoji}</div>
+      <div class="chalk-text chalk-write" style="font-size:28px">${esc(q.word)}</div>
+    </div>
+    <div class="chalk-step" data-speak="${q.hint}">
+      <div style="display:flex;align-items:center;justify-content:center;gap:16px">
+        <div class="chalk-text chalk-pink chalk-write" style="font-size:28px">${esc(q.word)}</div>
+        <span class="chalk-text chalk-write" style="font-size:24px">↔️</span>
+        <div class="chalk-text chalk-green chalk-write" style="font-size:28px">${esc(q.answer)}</div>
+      </div>
+    </div>
+    <div class="chalk-step" data-speak="The opposite of ${q.word} is ${q.answer}!">
+      <div class="chalk-text chalk-green chalk-write" style="font-size:32px">${esc(q.answer)}!</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
+}
+
+// ── Color tutorial ──────────────────────────────────────────────────────
+function buildTutorialColor(q) {
+  const colorEmojis = { Red: "🔴", Blue: "🔵", Green: "🟢", Yellow: "🟡", Orange: "🟠", Purple: "🟣", Pink: "🩷", Brown: "🟤", Black: "⚫", White: "⚪" };
+  const swatch = colorEmojis[q.answer] || "🎨";
+  return `
+    <div class="chalk-title chalk-text">${q.emoji}</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="What color is a ${q.object}?">
+      <div style="font-size:72px">${q.emoji}</div>
+      <div class="chalk-text chalk-write" style="font-size:22px">What color is a ${esc(q.object)}?</div>
+    </div>
+    <div class="chalk-step" data-speak="${q.hint}">
+      <div style="font-size:48px">${swatch}</div>
+      <div class="chalk-text chalk-yellow chalk-write" style="font-size:20px">${esc(q.hint)}</div>
+    </div>
+    <div class="chalk-step" data-speak="It's ${q.answer}!">
+      <div class="chalk-text chalk-green chalk-write" style="font-size:32px">${q.answer}! ${swatch}</div>
+      <div style="font-size:48px">🎉</div>
+    </div>`;
 }
 
 // ── Addition tutorial builders (visual + speech + chalk-write) ───────

@@ -15,7 +15,7 @@ def _load_questions(filename):
 
 MATH_Q = _load_questions("math.json")
 VERBAL_Q = _load_questions("verbal.json")
-CHESS_Q = _load_questions("chess.json")
+
 
 # ── startup / shutdown ────────────────────────────────────────────────────────
 @app.on_event("startup")
@@ -86,10 +86,6 @@ def get_math_questions(player_name: str = Query("")):
 @app.get("/api/questions/verbal")
 def get_verbal_questions(player_name: str = Query("")):
     return _pick_questions(VERBAL_Q, "verbal", player_name)
-
-@app.get("/api/questions/chess")
-def get_chess_questions(player_name: str = Query("")):
-    return _pick_questions(CHESS_Q, "chess", player_name)
 
 # ── answer + progress ─────────────────────────────────────────────────────────
 @app.post("/api/answer")

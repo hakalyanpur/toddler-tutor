@@ -1,63 +1,44 @@
-# Syllabus — Advanced N1 / Pre-N2 (Age 3.5, Ahead of Typical)
+# Syllabus — N2/K1 Top-Tier (Age 4, Singapore Curriculum)
 
 ## Learner Profile: Avyaan
 
-- **Age:** 3.5 years
-- **Numbers:** Knows 1–100, basic addition
+- **Age:** 4 years
+- **Numbers:** Knows 1–100, addition/subtraction foundations
 - **Letters:** Knows A–Z and a–z, can write his name
 - **Communication:** Strong verbal communicator in English
-- **Reading/Writing:** Cannot yet read/write in an organized manner — sight words and simple reading are the right next step
+- **Reading/Writing:** Building sight words, CVC blending, early phonics
+- **Target level:** Top-performing 4-year-old at elite Singapore preschool (N2/K1)
 
 ## Framework Context
 
-The MOE **Nurturing Early Learners (NEL)** framework formally covers ages **4–6** (N2, K1, K2).
-N1 (age 3–4) sits *below* the NEL scope, but Singapore preschools use NEL as a
-north star and teach **pre-NEL readiness skills** at the N1 level.
+Based on the MOE **Nurturing Early Learners (NEL)** framework and curriculum standards
+from top Singapore preschools (MindChamps, Mulberry Learning, EtonHouse, MOE Kindergartens).
+Questions target the **upper end** of N2/K1 expectations — what the best students excel at.
 
-Avyaan has mastered typical N1 skills (counting 1–10, letter recognition) and is
-working at an **advanced N1 / pre-N2 level**. The question bank targets skills
-that bridge N1 mastery into N2 readiness.
-
-Reference: [NEL Framework (MOE)](https://www.moe.gov.sg/preschool/curriculum) |
-[NEL Framework PDF (2022)](https://www.moe.gov.sg/-/media/files/mk/nurturing-early-learners-nel-framework-2022.pdf)
+Approach follows Singapore's **Concrete → Pictorial → Abstract (CPA)** method:
+emoji visuals (pictorial) paired with number/word choices (abstract), with strategy hints
+that teach the method, not just the answer.
 
 ---
 
-## Numeracy
+## Numeracy (134 questions in `math.json`)
 
-| Topic | Scope | Question Types |
-|---|---|---|
-| Addition | Sums up to 20 with strategy hints (count on, make 10, number bonds, doubles) | `addition` |
-| Subtraction | Differences up to 20, no negatives, with strategy hints (count back, bridge 10) | `subtraction` |
-| Number ordering | Before/after numbers 1–100, comparing multi-digit numbers | `number_order` |
-| Comparison | Which is bigger — numbers 1–100 (tens-digit reasoning) | `bigger` |
-| Patterns | Skip counting (+3, +5, +10), doubling, two-digit sequences | `pattern` |
-| Shapes | Triangle, circle, square, rectangle, pentagon, hexagon, oval, diamond | `shape` |
-| Sorting | Odd one out — spot the different item | `sorting` |
-| More/Less | Compare groups visually | `more_less` |
+| Topic | Count | Scope | Question Types |
+|---|---|---|---|
+| Addition | 24 | Sums up to 15 with strategy hints (count on, make 10, number bonds, doubles) | `addition` |
+| Subtraction | 20 | Differences within 10 and 20, with strategy hints (count back, bridge 10, number bonds) | `subtraction` |
+| Patterns | 18 | Skip counting (+1, +2, +3, +5, +10), doubling, countdown, repeating sequences | `pattern` |
+| Shapes | 20 | 2D (triangle, circle, square, rectangle, oval, diamond) + 3D (sphere, cube, cylinder, cone) | `shape` |
+| Number ordering | 8 | Before/after/between numbers 1–20 | `number_order` |
+| Comparison | 8 | Which number is bigger, comparing within 20 | `bigger` |
+| More/Less | 6 | Compare groups visually (emoji groups) | `more_less` |
+| Sorting | 6 | Odd one out — spot the different item | `sorting` |
+| Measurement | 8 | Longer/shorter, taller/shorter, heavier/lighter, bigger/smaller | `measurement` |
+| Positional words | 6 | Next to, above, on top of, under, between | `positional` |
+| Time | 5 | Morning/afternoon/night, daily routines | `time` |
+| Money | 5 | US coins (penny, nickel, dime, quarter), value comparison | `money` |
 
-### Retired (mastered)
-- `count` — counting objects 1–10 (too easy, knows 1–100)
-
-## Literacy (English)
-
-| Topic | Scope | Question Types |
-|---|---|---|
-| Sight words | Recognise common sight words (the, and, dog, cat, see, run, big, red) | `sight_word` |
-| Spelling | Pick the correct spelling of CVC words with phonics hints | `spelling` |
-| Sentence completion | Complete simple sentences with context clues and emoji | `sentence` |
-| Rhyming | Identify rhyming word pairs | `rhyme` |
-| Word-picture association | Match words to pictures / concepts | `word` |
-| Animal sounds | Identify sounds animals make | `sound` |
-| Opposites | Basic opposite pairs (big/small, hot/cold) | `opposite` |
-| Colors | Name colors of common objects | `color` |
-
-### Retired (mastered)
-- `letter` — basic uppercase letter recognition (knows A–Z and a–z)
-
----
-
-## Addition/Subtraction Strategy Hints
+### Addition/Subtraction Strategy Hints
 
 Every arithmetic question includes a **method hint** showing HOW to solve it:
 
@@ -72,33 +53,33 @@ Every arithmetic question includes a **method hint** showing HOW to solve it:
 
 ---
 
-## How Singapore Compares Globally
+## Literacy (97 questions in `verbal.json`)
 
-Singapore ranks **#1 worldwide** in the PISA 2022 assessment (maths, reading, and science)
-and has consistently topped TIMSS since 1995. The strength starts in early childhood —
-high preschool participation rates and a structured progression from N1 → N2 → K1 → K2
-build strong foundations before primary school.
+| Topic | Count | Scope | Question Types |
+|---|---|---|---|
+| Phonics | 15 | 10 letter sounds (b, d, f, g, k, m, n, p, s, t) + 5 CVC blending | `phonics` |
+| Sight words | 15 | Common high-frequency words (I, a, the, is, my, it, on, up, go, see, can, we, he, she, no) | `sight_word` |
+| Spelling | 12 | CVC words (cat, dog, sun, hat, bed, pig, cup, bus) + CCVC/CVCC (frog, jump, stop, clap) | `spelling` |
+| Sentence completion | 8 | Complete simple sentences with context clues and emoji | `sentence` |
+| Word-picture | 8 | Match words to pictures / concepts | `word` |
+| Rhyming | 7 | Identify rhyming word pairs | `rhyme` |
+| Opposites | 8 | Basic opposite pairs (big/small, hot/cold, long/short, hard/soft) | `opposite` |
+| Animal sounds | 6 | Identify sounds animals make | `sound` |
+| Colors | 6 | Name colors of common objects | `color` |
+| Digraphs | 6 | Two-letter sounds: sh, ch, th (2 each) | `digraph` |
+| Story comprehension | 6 | Simple 2–3 sentence passages with who/what/where questions | `story` |
 
-Key differentiators of Singapore's approach:
-- **Concrete → Pictorial → Abstract (CPA)** — children handle objects before pictures before symbols
-- **Mastery-based** — fewer topics, deeper understanding
-- **Integrated learning** — numeracy and literacy taught through play, stories, and daily routines
-
-Our app follows CPA: emoji visuals (pictorial) paired with number/word choices (abstract),
-with strategy hints that teach the method, not just the answer.
+### Retired (mastered)
+- `letter` — basic uppercase letter recognition (knows A–Z and a–z)
 
 ---
 
-## Coverage Status
-
-- **`questions/math.json`** — 50 questions covering `addition`, `subtraction`, `number_order`, `bigger`, `pattern`, `shape`, `sorting`, `more_less`
-- **`questions/verbal.json`** — 50 questions covering `rhyme`, `sight_word`, `spelling`, `sentence`, `word`, `sound`, `opposite`, `color`
-
 ## Not Yet Covered
 
-- **Story comprehension** — simple story-based questions
-- **Positional words** — in, on, under, beside
-- **Days of the week / daily routines** — sequencing everyday activities
-- **Simple reading passages** — 2–3 sentence stories with comprehension questions
-- **Writing practice** — letter/word tracing (would need different UI)
-- **Social-emotional** — identifying feelings, sharing, turn-taking (core NEL area but hard to quiz)
+- **Positional words expansion** — beside, around, through
+- **Simple reading passages** — longer 4–5 sentence stories
+- **Writing practice** — letter/word tracing (needs different UI)
+- **Social-emotional** — identifying feelings, sharing, turn-taking
+- **Bilingual** — Mandarin vocabulary and characters
+- **Multiplication foundations** — groups of (2 groups of 3)
+- **Analog clock** — telling time to the hour

@@ -1,6 +1,9 @@
 import sqlite3, os
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "db", "tutor.db")
+if os.environ.get("FLY_APP_NAME"):
+    DB_PATH = "/data/tutor.db"
+else:
+    DB_PATH = os.path.join(os.path.dirname(__file__), "db", "tutor.db")
 
 def init_db():
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
