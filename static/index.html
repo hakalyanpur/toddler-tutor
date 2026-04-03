@@ -187,6 +187,18 @@
   }
   input[type=text]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,.12); }
 
+  /* ── session summary ── */
+  .summary-stat {
+    background: var(--accent-l); border: 1.5px solid var(--accent-m);
+    border-radius: 12px; padding: 10px 16px; min-width: 80px; text-align: center;
+  }
+  .summary-stat-val { font-family: 'Fredoka One', cursive; font-size: 20px; color: var(--accent); }
+  .summary-stat-lbl { font-size: 12px; color: var(--text-sub); font-weight: 700; text-transform: uppercase; margin-top: 2px; }
+  .summary-table { width: 100%; border-collapse: collapse; margin: 12px 0 16px; }
+  .summary-table th { font-family: 'Fredoka One', cursive; color: var(--accent); font-size: 13px; padding: 6px 8px; border-bottom: 2px solid var(--table-border); }
+  .summary-table td { padding: 6px 8px; border-bottom: 1px solid var(--table-border); text-align: center; }
+  .summary-table tr:last-child td { border-bottom: none; }
+
   /* ── confetti burst ── */
   .confetti-wrap { pointer-events:none; position:fixed; inset:0; z-index:999; overflow:hidden; }
   .conf { position:absolute; top:-20px; width:10px; height:10px; border-radius:2px;
@@ -587,6 +599,9 @@ let streak = 0;
 let wrongCount = 0;       // how many wrong attempts on current question
 let currentHint = "";     // hint for current question
 let currentCorrect = "";  // correct answer for current question
+let sessionStartTime = null;   // when the current round started
+let questionStartTime = null;  // when the current question was shown
+let questionResults = [];      // [{question, correct, timeMs, type}] for summary
 
 // ── stars ──────────────────────────────────────────────────────────────────
 (function() {
@@ -623,6 +638,7 @@ function goHome() {
 // ── start mode ─────────────────────────────────────────────────────────────
 async function startMode(mode) {
   sessionCorrect = 0; sessionTotal = 0; streak = 0; qIndex = 0; wrongCount = 0;
+  sessionStartTime = Date.now(); questionResults = [];
   updateScoreBar();
   document.getElementById("feedback").textContent = "";
   document.getElementById("backBtn").classList.remove("hidden");
@@ -658,6 +674,7 @@ function renderQuestion() {
   wrongCount = 0;
   currentHint = q.hint || "";
   currentCorrect = "";
+  questionStartTime = Date.now();
 
   if(q.type === "addition" || q.type === "subtraction") {
     currentCorrect = String(q.answer);
@@ -925,10 +942,17 @@ async function checkAnswer(given, correct, qid) {
   }
 
   // Either correct, or second wrong attempt
+  const qTimeMs = Date.now() - questionStartTime;
   sessionTotal++;
   if(isOk) { sessionCorrect++; streak++; confetti(); }
   else streak = 0;
   updateScoreBar();
+  questionResults.push({
+    question: questions[qIndex].display || questions[qIndex].question || questions[qIndex].word || questions[qIndex].sentence || questions[qIndex].object || `Q${qIndex+1}`,
+    type: questions[qIndex].type,
+    correct: isOk,
+    timeMs: qTimeMs
+  });
 
   // disable all buttons
   document.querySelectorAll("#questionArea button, #questionArea .group-box").forEach(b=>{b.disabled=true; b.style.pointerEvents="none";});
@@ -970,14 +994,67 @@ function retryQuestion() {
 }
 
 // ── summary ────────────────────────────────────────────────────────────────
+function formatTime(ms) {
+  const totalSec = Math.round(ms / 1000);
+  const min = Math.floor(totalSec / 60);
+  const sec = totalSec % 60;
+  return min > 0 ? `${min}m ${sec}s` : `${sec}s`;
+}
+
 function showSummary() {
   const pct = sessionTotal ? Math.round((sessionCorrect/sessionTotal)*100) : 0;
+  const totalMs = Date.now() - sessionStartTime;
+  const mode = questions._mode;
+  const modeLabel = mode === "math" ? "🍎 Math" : "📖 Words";
+  const avgMs = sessionTotal ? Math.round(totalMs / sessionTotal) : 0;
+
+  // Star rating: 5/5=3stars, 4/5=2stars, <=3/5=1star
+  const stars = pct === 100 ? 3 : pct >= 80 ? 2 : 1;
+  const starEmoji = "⭐".repeat(stars) + "☆".repeat(3 - stars);
+
+  // Per-question results table
+  const resultRows = questionResults.map((r, i) => {
+    const icon = r.correct ? "✅" : "❌";
+    const label = r.question.length > 20 ? r.question.slice(0, 18) + "…" : r.question;
+    return `<tr>
+      <td style="font-size:16px">${i+1}</td>
+      <td style="font-size:16px;text-align:left">${esc(label)}</td>
+      <td style="font-size:18px">${icon}</td>
+      <td style="font-size:14px;color:var(--text-sub)">${formatTime(r.timeMs)}</td>
+    </tr>`;
+  }).join("");
+
   document.getElementById("questionArea").innerHTML = `
-    <div style="font-size:64px;margin:8px 0">🎉</div>
-    <h2 style="font-family:'Fredoka One',cursive;color:var(--purple);font-size:28px">All done!</h2>
-    <p style="font-size:22px;margin:10px 0">${sessionCorrect} / ${sessionTotal} correct (${pct}%)</p>
+    <div style="font-size:48px;margin:4px 0">${pct === 100 ? "🎉" : pct >= 60 ? "👏" : "💪"}</div>
+    <h2 style="font-family:'Fredoka One',cursive;color:var(--purple);font-size:26px">Session Complete!</h2>
+    <div style="font-size:28px;margin:6px 0">${starEmoji}</div>
+
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:12px 0">
+      <div class="summary-stat">
+        <div class="summary-stat-val">${modeLabel}</div>
+        <div class="summary-stat-lbl">Mode</div>
+      </div>
+      <div class="summary-stat">
+        <div class="summary-stat-val">${formatTime(totalMs)}</div>
+        <div class="summary-stat-lbl">Time</div>
+      </div>
+      <div class="summary-stat">
+        <div class="summary-stat-val">${sessionCorrect}/${sessionTotal}</div>
+        <div class="summary-stat-lbl">Score</div>
+      </div>
+      <div class="summary-stat">
+        <div class="summary-stat-val">${formatTime(avgMs)}</div>
+        <div class="summary-stat-lbl">Avg/Q</div>
+      </div>
+    </div>
+
+    <table class="summary-table">
+      <tr><th>#</th><th style="text-align:left">Question</th><th>Result</th><th>Time</th></tr>
+      ${resultRows}
+    </table>
+
     <div class="mt row">
-      <button class="btn-primary" onclick="startMode(questions._mode)">Play again 🔄</button>
+      <button class="btn-primary" onclick="startMode('${mode}')">Play again 🔄</button>
       <button class="btn-primary" style="background:linear-gradient(135deg,#43e97b,#38f9d7);color:#065f46" onclick="goHome()">Home 🏠</button>
     </div>`;
   if(pct===100) confetti(60);

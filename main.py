@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from starlette.responses import Response
 from pydantic import BaseModel
 from database import init_db, get_db, close_db
 import random, datetime, json, os
@@ -27,7 +28,9 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 def root():
-    return FileResponse("static/index.html")
+    resp = FileResponse("static/index.html")
+    resp.headers["Cache-Control"] = "no-cache"
+    return resp
 
 # ── schemas ───────────────────────────────────────────────────────────────────
 class AnswerPayload(BaseModel):
