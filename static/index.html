@@ -8,21 +8,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --accent: #7c5cff; --accent-l: #efeaff; --accent-m: #c9bcff;
-    --green:  #16b981; --orange: #ff9f43; --pink: #ff6b9d;
-    --bg1: #fdf2f8; --bg2: #eef0ff; --bg3: #e6fbff;
-    --card-bg: rgba(255,255,255,.82); --text: #2a2350; --text-sub: #7b75a0;
-    --table-border: #e7e3f5; --input-bg: #f3f1fc;
-    --shadow: 30px 80px -28px rgba(124,92,255,.28);
+    --accent: #0d9488; --accent-l: #e6f4f1; --accent-m: #9fd6cd;
+    --green:  #16a34a; --orange: #c2803a; --pink: #b5734a;
+    --bg1: #f1ebe0; --bg2: #f5f1eb; --bg3: #e9f3f0;
+    --card-bg: rgba(255,253,249,.86); --text: #1f1f1f; --text-sub: #6c6c6c;
+    --table-border: #e8e4de; --input-bg: #f0ebe1;
+    --shadow: 30px 70px -30px rgba(60,50,40,.22);
     --purple: var(--accent); --purple-l: var(--accent-l); --purple-m: var(--accent-m);
   }
   [data-theme="dark"] {
-    --accent: #a78bfa; --accent-l: #2a2350; --accent-m: #6d4ed6;
-    --green: #34d399; --orange: #fbbf24; --pink: #f9a8d4;
-    --bg1: #1a1438; --bg2: #0f1030; --bg3: #141a3a;
-    --card-bg: rgba(34,29,68,.78); --text: #f1ecff; --text-sub: #a99fd0;
-    --table-border: #3a3470; --input-bg: #241d4a;
-    --shadow: 30px 80px -28px rgba(0,0,0,.55);
+    --accent: #2dd4bf; --accent-l: #1e2c2a; --accent-m: #2d5a54;
+    --green: #34d399; --orange: #e0a55f; --pink: #d59a73;
+    --bg1: #1c1811; --bg2: #15120d; --bg3: #142019;
+    --card-bg: rgba(40,36,30,.80); --text: #f5f1eb; --text-sub: #b3aa9b;
+    --table-border: #3c362c; --input-bg: #241f17;
+    --shadow: 30px 70px -30px rgba(0,0,0,.6);
     --purple: var(--accent); --purple-l: var(--accent-l); --purple-m: var(--accent-m);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -44,7 +44,7 @@
   .star {
     position: absolute; opacity: .5;
     animation: floatY 7s ease-in-out infinite;
-    filter: drop-shadow(0 2px 6px rgba(124,92,255,.18));
+    filter: drop-shadow(0 2px 6px rgba(150,120,70,.22));
   }
   @keyframes floatY {
     0%,100% { transform: translateY(0) rotate(-6deg); opacity: .35; }
@@ -72,12 +72,12 @@
   button:disabled { opacity: .5; cursor: not-allowed; }
 
   .btn-primary {
-    background: linear-gradient(135deg, #8b6cff, #6d4ed6); color: #fff;
+    background: linear-gradient(135deg, #14b8a6, #0d9488); color: #fff;
     border-radius: 16px; padding: 15px 30px; font-size: 18px;
-    box-shadow: 0 8px 20px -6px rgba(124,92,255,.55);
+    box-shadow: 0 8px 20px -6px rgba(60,50,40,.4);
     transition: transform .15s, box-shadow .15s, filter .15s;
   }
-  .btn-primary:hover { filter: brightness(1.06); box-shadow: 0 12px 26px -8px rgba(124,92,255,.7); transform: translateY(-2px); }
+  .btn-primary:hover { filter: brightness(1.06); box-shadow: 0 12px 26px -8px rgba(60,50,40,.5); transform: translateY(-2px); }
   .btn-mode {
     border-radius: 22px; padding: 22px 22px; color: #fff;
     display: flex; flex-direction: column; align-items: center; gap: 6px;
@@ -87,8 +87,8 @@
   }
   .btn-mode:hover { transform: translateY(-3px) scale(1.02); filter: brightness(1.05); box-shadow: 0 16px 30px -10px rgba(0,0,0,.4); }
   .btn-mode .icon { font-size: 34px; }
-  .btn-math   { background: linear-gradient(135deg, #8b6cff, #6d4ed6); }
-  .btn-verbal { background: linear-gradient(135deg, #2dd4bf, #0ea5a3); }
+  .btn-math   { background: linear-gradient(135deg, #14b8a6, #0d9488); }
+  .btn-verbal { background: linear-gradient(135deg, #d99a52, #c2803a); color: #4a2f10; }
 
   .btn-board  { background: linear-gradient(135deg, #ffb347, #ff8c42); color: #5a2e00; }
 
@@ -96,24 +96,24 @@
     background: var(--card-bg); border: 2px solid var(--accent-m);
     border-radius: 16px; padding: 14px 20px; font-size: 20px;
     color: var(--accent); min-width: 90px;
-    box-shadow: 0 4px 12px -6px rgba(124,92,255,.35);
+    box-shadow: 0 4px 12px -6px rgba(60,50,40,.28);
     transition: transform .12s, background .15s, color .15s, box-shadow .15s, border-color .15s;
   }
-  .btn-answer:hover:not(:disabled) { background: linear-gradient(135deg, #8b6cff, #6d4ed6); border-color: transparent; color: #fff; transform: translateY(-2px); box-shadow: 0 10px 20px -8px rgba(124,92,255,.6); }
+  .btn-answer:hover:not(:disabled) { background: linear-gradient(135deg, #14b8a6, #0d9488); border-color: transparent; color: #fff; transform: translateY(-2px); box-shadow: 0 10px 20px -8px rgba(60,50,40,.45); }
 
   .btn-back {
     position: fixed; top: 14px; left: 14px; z-index: 10;
     background: var(--card-bg); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
     border: 1px solid rgba(255,255,255,.5);
     border-radius: 14px; padding: 9px 17px; color: var(--accent); font-size: 15px;
-    box-shadow: 0 6px 16px -8px rgba(124,92,255,.4);
+    box-shadow: 0 6px 16px -8px rgba(60,50,40,.32);
   }
   .btn-theme {
     position: fixed; top: 14px; right: 14px; z-index: 10;
     background: var(--card-bg); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
     border: 1px solid rgba(255,255,255,.5);
     border-radius: 14px; padding: 9px 15px; font-size: 18px;
-    box-shadow: 0 6px 16px -8px rgba(124,92,255,.4);
+    box-shadow: 0 6px 16px -8px rgba(60,50,40,.32);
   }
 
   /* ── quiz layout ── */
@@ -128,11 +128,11 @@
     background: var(--card-bg); cursor: pointer; display: flex;
     flex-direction: column; align-items: center; gap: 8px;
     font-family: 'Fredoka One', cursive;
-    box-shadow: 0 8px 22px -8px rgba(124,92,255,.4);
+    box-shadow: 0 8px 22px -8px rgba(60,50,40,.32);
     transition: transform .12s, box-shadow .15s, border-color .15s;
   }
   .pick-btn .pick-num { font-size: 52px; color: var(--purple); line-height:1; }
-  .pick-btn:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 14px 28px -10px rgba(124,92,255,.6); }
+  .pick-btn:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 14px 28px -10px rgba(60,50,40,.45); }
 
   /* ── feedback ── */
   .feedback {
@@ -145,12 +145,16 @@
 
   /* ── hint box ── */
   .hint-box {
-    background: linear-gradient(135deg, #fff7e6, #fff0f6);
-    border: 2px solid #ffd98a; border-radius: 18px;
-    padding: 15px 22px; margin: 12px 0; font-size: 18px; color: #8a5a00;
+    background: linear-gradient(135deg, #fbf5e9, #f4eee1);
+    border: 2px solid #e3c489; border-radius: 18px;
+    padding: 15px 22px; margin: 12px 0; font-size: 18px; color: #6b4e1f;
     font-family: 'Nunito', sans-serif; font-weight: 700;
-    box-shadow: 0 10px 22px -12px rgba(255,159,67,.55);
+    box-shadow: 0 10px 22px -12px rgba(120,90,40,.4);
     animation: pop .3s ease both;
+  }
+  [data-theme="dark"] .hint-box {
+    background: linear-gradient(135deg, #2c2519, #241f15);
+    border-color: #5c4a2a; color: #e8d3a3;
   }
   .btn-retry {
     background: #f59e0b; color: #fff;
@@ -171,10 +175,10 @@
     background: var(--card-bg); border: 2.5px solid var(--purple-m);
     border-radius: 20px; padding: 16px 20px; font-size: 36px;
     cursor: pointer; min-width: 100px; text-align: center;
-    box-shadow: 0 8px 22px -10px rgba(124,92,255,.4);
+    box-shadow: 0 8px 22px -10px rgba(60,50,40,.32);
     transition: transform .12s, border-color .15s, box-shadow .15s;
   }
-  .group-box:hover { border-color: var(--accent); transform: translateY(-3px) scale(1.04); box-shadow: 0 14px 28px -10px rgba(124,92,255,.55); }
+  .group-box:hover { border-color: var(--accent); transform: translateY(-3px) scale(1.04); box-shadow: 0 14px 28px -10px rgba(60,50,40,.4); }
 
   /* ── story passage ── */
   .story-passage {
@@ -191,7 +195,7 @@
     color: var(--accent); margin-bottom: 12px; position: relative; z-index: 1;
     background: var(--card-bg); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
     border-radius: 18px; padding: 9px 22px;
-    box-shadow: 0 10px 24px -12px rgba(124,92,255,.4); border: 1px solid rgba(255,255,255,.5);
+    box-shadow: 0 10px 24px -12px rgba(60,50,40,.32); border: 1px solid rgba(255,255,255,.5);
   }
   .streak { color: var(--orange); }
 
@@ -570,7 +574,7 @@
   .mt { margin-top: 16px; }
   .title {
     font-size: 38px; margin: 8px 0 4px; letter-spacing: -0.5px;
-    background: linear-gradient(135deg, #8b6cff, #ff6b9d 90%);
+    background: linear-gradient(135deg, #0f766e, #14b8a6 95%);
     -webkit-background-clip: text; background-clip: text;
     -webkit-text-fill-color: transparent; color: var(--accent);
   }
@@ -2199,6 +2203,44 @@ function buildTutorialAddition(q) {
       <div class="chalk-step" data-speak="${a} plus ${b} equals ${ans}!">
         ${eq(a, "+", b, ans)}
         <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  if (method === "two_digit") {
+    // Show BOTH techniques: the mental tens-&-ones method first (Singapore
+    // emphasis), then the written column/stack method. No regrouping.
+    const aT = Math.floor(a / 10), aO = a % 10;
+    const bT = Math.floor(b / 10), bO = b % 10;
+    const ansT = Math.floor(ans / 10), ansO = ans % 10;
+    const tensSum = (aT + bT) * 10, onesSum = aO + bO;
+    const grid = `
+      <div class="chalk-col-head"><span class="h-tens">tens</span><span class="h-ones">ones</span></div>
+      <div class="chalk-col">
+        <span></span><span class="col-tens">${aT}</span><span class="col-ones">${aO}</span>
+        <span class="col-op">+</span><span class="col-tens">${bT}</span><span class="col-ones">${bO}</span>
+        <span class="col-rule"></span>
+        <span></span><span class="col-ans">${ansT}</span><span class="col-ans">${ansO}</span>
+      </div>`;
+    return `
+      <div class="chalk-title chalk-text">➕ Two Ways!</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="Let's add ${a} plus ${b} two different ways!">
+        <div class="chalk-equation">${a} + ${b} = ?</div>
+      </div>
+      <div class="chalk-step" data-speak="Way one: in your head! Split into tens and ones. ${tensSum > 0 ? aT * 10 + ' plus ' + bT * 10 + ' is ' + tensSum + '. ' : ''}${aO} plus ${bO} is ${onesSum}. Together that makes ${ans}.">
+        <div class="chalk-text chalk-write" style="font-size:20px;margin-bottom:6px">✋ Way 1 — In your head</div>
+        <div class="chalk-text chalk-write" style="font-size:23px;color:rgba(120,200,255,.95)">🔵 Tens: ${aT * 10} + ${bT * 10} = ${tensSum}</div>
+        <div class="chalk-text chalk-write" style="font-size:23px;color:rgba(255,235,120,.95)">🟡 Ones: ${aO} + ${bO} = ${onesSum}</div>
+        <div class="chalk-text chalk-green chalk-write" style="font-size:26px;margin-top:4px">${tensSum} + ${onesSum} = ${ans}</div>
+      </div>
+      <div class="chalk-step" data-speak="Way two: write it down and stack it! Add the ones first: ${aO} plus ${bO} is ${ansO}. Then the tens: ${aT} plus ${bT} is ${ansT}.">
+        <div class="chalk-text chalk-write" style="font-size:20px;margin-bottom:4px">📋 Way 2 — Stack it</div>
+        ${grid}
+        <div class="chalk-text chalk-write" style="font-size:18px;margin-top:4px">Ones first, then tens!</div>
+      </div>
+      <div class="chalk-step" data-speak="Both ways give ${ans}! ${a} plus ${b} equals ${ans}!">
+        ${eq(a, "+", b, ans)}
+        <div style="font-size:44px">🎉</div>
       </div>`;
   }
 

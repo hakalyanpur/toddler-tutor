@@ -62,7 +62,9 @@ All two-digit problems are **no-regrouping** (the ones column never exceeds 9), 
 
 1. **2-digit + 1-digit** (e.g. 21 + 4) — `split_tens`
 2. **Adding whole tens** (e.g. 20 + 30) — `add_tens`
-3. **2-digit + 2-digit** (e.g. 23 + 14) — taught both ways: `split_tens` (mental) and `column` (long-form)
+3. **2-digit + 2-digit** (e.g. 23 + 14) — `two_digit`: a single "Two Ways!" explainer that shows **both** techniques in sequence — the mental tens-&-ones method first (Singapore's emphasis), then the written column/stack method — reinforcing that the algorithm is just the written form of the mental strategy.
+
+> **Pedagogical note:** Singapore math deliberately teaches mental calculation (number bonds, make-ten, decompose into tens & ones) *before* and *as the basis for* the standard column algorithm. The two-digit explainer mirrors this: head first, paper second.
 
 ---
 
