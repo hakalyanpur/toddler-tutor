@@ -21,11 +21,12 @@ that teach the method, not just the answer.
 
 ---
 
-## Numeracy (134 questions in `math.json`)
+## Numeracy (156 questions in `math.json`)
 
 | Topic | Count | Scope | Question Types |
 |---|---|---|---|
-| Addition | 24 | Sums up to 15 with strategy hints (count on, make 10, number bonds, doubles) | `addition` |
+| Addition (1-digit) | 24 | Sums within 18 with strategy hints (count on, make 10, number bonds, doubles) | `addition` |
+| Addition (2-digit) | 22 | **Two-digit addition within 100, no regrouping**: 2-digit + 1-digit, adding tens, and 2-digit + 2-digit. Taught with the mental "tens & ones" decompose strategy and the long-form column algorithm | `addition` |
 | Subtraction | 20 | Differences within 10 and 20, with strategy hints (count back, bridge 10, number bonds) | `subtraction` |
 | Patterns | 18 | Skip counting (+1, +2, +3, +5, +10), doubling, countdown, repeating sequences | `pattern` |
 | Shapes | 20 | 2D (triangle, circle, square, rectangle, oval, diamond) + 3D (sphere, cube, cylinder, cone) | `shape` |
@@ -48,8 +49,20 @@ Every arithmetic question includes a **method hint** showing HOW to solve it:
 | **Count back** | Small subtrahends (1–6) | "Start at 10, count back 3: 9, 8, 7!" |
 | **Make 10** | When one number is close to 10 | "8 + 5: take 2 from 5 to make 10, then add 3 = 13" |
 | **Number bonds** | When numbers pair to 10 | "7 + 3 = 10, so 7 + 5 = 10 + 2 = 12" |
-| **Bridge 10** | Subtraction crossing 10 | "12 − 5: 12 − 2 = 10, then 10 − 3 = 7" |
+| **Bridge 10** | Subtraction crossing 10 | "13 − 5: 13 − 3 = 10, then 10 − 2 = 8" |
 | **Doubles** | Same number added/subtracted | "6 + 6 = 12 (double 6!)" |
+| **Split tens & ones** | Two-digit addition (mental) | "23 + 14: tens 20 + 10 = 30, ones 3 + 4 = 7, together 37" |
+| **Add tens** | Adding whole tens | "20 + 30: 2 tens + 3 tens = 5 tens = 50" |
+| **Column (long-form)** | Two-digit addition (written) | "Stack them, add the ones column first, then the tens column" |
+
+### Two-Digit Addition Progression (Primary-1 reach for strong K1/K2)
+
+Follows the Singapore CPA path — mental decomposition first, the written column algorithm second.
+All two-digit problems are **no-regrouping** (the ones column never exceeds 9), so the column method stays clean before carrying is introduced.
+
+1. **2-digit + 1-digit** (e.g. 21 + 4) — `split_tens`
+2. **Adding whole tens** (e.g. 20 + 30) — `add_tens`
+3. **2-digit + 2-digit** (e.g. 23 + 14) — taught both ways: `split_tens` (mental) and `column` (long-form)
 
 ---
 
@@ -81,5 +94,6 @@ Every arithmetic question includes a **method hint** showing HOW to solve it:
 - **Writing practice** — letter/word tracing (needs different UI)
 - **Social-emotional** — identifying feelings, sharing, turn-taking
 - **Bilingual** — Mandarin vocabulary and characters
+- **Two-digit addition with regrouping** — carrying a ten when the ones exceed 9 (next step after the current no-regrouping set)
 - **Multiplication foundations** — groups of (2 groups of 3)
 - **Analog clock** — telling time to the hour
