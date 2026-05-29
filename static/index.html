@@ -2206,6 +2206,40 @@ function buildTutorialAddition(q) {
       </div>`;
   }
 
+  if (method === "near_10") {
+    // Crossing a ten: fill the bigger number up to the next ten using a
+    // number bond, then add the leftover. Formalizes the count-on instinct.
+    const bigger = Math.max(a, b), smaller = Math.min(a, b);
+    const nextTen = Math.ceil(bigger / 10) * 10;
+    const fill = nextTen - bigger;       // how many more to reach the next ten
+    const leftover = smaller - fill;     // what's left of the smaller number
+    return `
+      <div class="chalk-title chalk-text">🔟 Make the Next Ten</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="Let's add ${bigger} plus ${smaller}.">
+        <div class="chalk-equation">${bigger} + ${smaller} = ?</div>
+      </div>
+      <div class="chalk-step" data-speak="${bigger} only needs ${fill} more to reach ${nextTen}. So split ${smaller} into ${fill} and ${leftover}.">
+        <div class="chalk-text chalk-write" style="font-size:18px;margin-bottom:4px">Split ${smaller} to fill up to ${nextTen}</div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+          <div class="chalk-text chalk-write" style="font-size:30px">${smaller}</div>
+          <svg width="84" height="24" viewBox="0 0 84 24"><line class="chalk-svg-line" x1="42" y1="2" x2="14" y2="22" stroke="rgba(255,255,255,.5)" stroke-width="2.5"/><line class="chalk-svg-line" x1="42" y1="2" x2="70" y2="22" stroke="rgba(255,255,255,.5)" stroke-width="2.5" style="animation-delay:.3s"/></svg>
+          <div style="display:flex;gap:24px">
+            <span class="chalk-text" style="font-size:26px;color:rgba(120,200,255,.95)">${fill}</span>
+            <span class="chalk-text" style="font-size:26px;color:rgba(255,235,120,.95)">${leftover}</span>
+          </div>
+        </div>
+      </div>
+      <div class="chalk-step" data-speak="${bigger} plus ${fill} makes ${nextTen}!">
+        <div class="chalk-text chalk-green chalk-write" style="font-size:28px">${bigger} + ${fill} = ${nextTen} 🔟</div>
+      </div>
+      <div class="chalk-step" data-speak="Now add the ${leftover} that's left. ${nextTen} plus ${leftover} equals ${ans}!">
+        <div class="chalk-text chalk-write" style="font-size:28px;color:rgba(255,235,120,.95)">${nextTen} + ${leftover} = ${ans}</div>
+        ${eq(a, "+", b, ans)}
+        <div style="font-size:44px">🎉</div>
+      </div>`;
+  }
+
   if (method === "two_digit") {
     // Show BOTH techniques: the mental tens-&-ones method first (Singapore
     // emphasis), then the written column/stack method. No regrouping.

@@ -49,6 +49,15 @@
   {"id": "t21", "type": "addition", "a": 36, "b": 22, "answer": 58, "display": "36 + 22 = ?", "hint": "Two ways! In your head: tens 30+20=50, ones 6+2=8 → 58. Or stack it!", "method": "two_digit"},
   {"id": "t22", "type": "addition", "a": 51, "b": 18, "answer": 69, "display": "51 + 18 = ?", "hint": "Two ways! In your head: tens 50+10=60, ones 1+8=9 → 69. Or stack it!", "method": "two_digit"},
 
+  {"id": "nt1", "type": "addition", "a": 28, "b": 5, "answer": 33, "display": "28 + 5 = ?", "hint": "28 needs 2 to make 30. Split 5 into 2 and 3: 28 + 2 = 30, then + 3 = 33!", "method": "near_10"},
+  {"id": "nt2", "type": "addition", "a": 47, "b": 6, "answer": 53, "display": "47 + 6 = ?", "hint": "47 needs 3 to make 50. Split 6 into 3 and 3: 47 + 3 = 50, then + 3 = 53!", "method": "near_10"},
+  {"id": "nt3", "type": "addition", "a": 36, "b": 7, "answer": 43, "display": "36 + 7 = ?", "hint": "36 needs 4 to make 40. Split 7 into 4 and 3: 36 + 4 = 40, then + 3 = 43!", "method": "near_10"},
+  {"id": "nt4", "type": "addition", "a": 59, "b": 4, "answer": 63, "display": "59 + 4 = ?", "hint": "59 needs 1 to make 60. Split 4 into 1 and 3: 59 + 1 = 60, then + 3 = 63!", "method": "near_10"},
+  {"id": "nt5", "type": "addition", "a": 18, "b": 5, "answer": 23, "display": "18 + 5 = ?", "hint": "18 needs 2 to make 20. Split 5 into 2 and 3: 18 + 2 = 20, then + 3 = 23!", "method": "near_10"},
+  {"id": "nt6", "type": "addition", "a": 65, "b": 8, "answer": 73, "display": "65 + 8 = ?", "hint": "65 needs 5 to make 70. Split 8 into 5 and 3: 65 + 5 = 70, then + 3 = 73!", "method": "near_10"},
+  {"id": "nt7", "type": "addition", "a": 27, "b": 6, "answer": 33, "display": "27 + 6 = ?", "hint": "27 needs 3 to make 30. Split 6 into 3 and 3: 27 + 3 = 30, then + 3 = 33!", "method": "near_10"},
+  {"id": "nt8", "type": "addition", "a": 49, "b": 7, "answer": 56, "display": "49 + 7 = ?", "hint": "49 needs 1 to make 50. Split 7 into 1 and 6: 49 + 1 = 50, then + 6 = 56!", "method": "near_10"},
+
   {"id": "sub1",  "type": "subtraction", "a": 4,  "b": 1,  "answer": 3,  "display": "4 − 1 = ?",  "hint": "Start at 4, count back 1: 3!",                         "method": "count_back"},
   {"id": "sub2",  "type": "subtraction", "a": 6,  "b": 3,  "answer": 3,  "display": "6 − 3 = ?",  "hint": "Double 3 is 6, so 6 take away 3 is 3!",               "method": "doubles"},
   {"id": "sub3",  "type": "subtraction", "a": 5,  "b": 2,  "answer": 3,  "display": "5 − 2 = ?",  "hint": "Start at 5, count back 2: 4, 3!",                     "method": "count_back"},
