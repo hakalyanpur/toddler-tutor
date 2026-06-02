@@ -579,6 +579,48 @@
     -webkit-text-fill-color: transparent; color: var(--accent);
   }
   .sub   { color: var(--text-sub); font-size: 16px; margin-bottom: 20px; font-weight: 700; }
+
+  /* ── reading tier picker ── */
+  .tier-list { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+  .tier-card {
+    display: flex; align-items: center; gap: 14px; text-align: left;
+    background: var(--card-bg); border: 2.5px solid var(--accent-m);
+    border-radius: 18px; padding: 14px 18px; cursor: pointer; width: 100%;
+    transition: transform .12s, box-shadow .12s, background .12s;
+  }
+  .tier-card:hover { transform: translateY(-2px); background: var(--accent-l); box-shadow: 0 6px 18px rgba(13,148,136,.18); }
+  .tier-icon { font-size: 38px; line-height: 1; }
+  .tier-body { display: flex; flex-direction: column; }
+  .tier-name { font-family: 'Fredoka One', cursive; color: var(--accent); font-size: 19px; }
+  .tier-blurb { color: var(--text-sub); font-size: 14px; font-weight: 700; }
+
+  /* ── letter sound / sound-it-out ── */
+  .ls-letter {
+    font-family: 'Fredoka One', cursive; font-size: 96px; line-height: 1;
+    color: var(--accent); margin: 6px 0; cursor: pointer; user-select: none;
+    text-transform: lowercase;
+  }
+  .ls-tiles { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 14px 0; }
+  .ls-tile {
+    font-family: 'Fredoka One', cursive; font-size: 48px; width: 78px; height: 92px;
+    border-radius: 16px; border: 3px solid var(--accent-m); background: var(--accent-l);
+    color: var(--accent); cursor: pointer; text-transform: lowercase;
+    transition: transform .12s, background .12s, color .12s;
+  }
+  .ls-tile:hover { transform: translateY(-3px) scale(1.04); }
+  .ls-tile.tapped { background: var(--green); color: #fff; border-color: var(--green); }
+  .ls-sayword { opacity: .55; }
+  .ls-sayword.ready { opacity: 1; animation: ls-pulse 1.1s ease-in-out infinite; }
+  @keyframes ls-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+  .sio-word {
+    font-family: 'Fredoka One', cursive; font-size: 56px; color: var(--green);
+    text-transform: lowercase; margin: 8px 0; animation: ls-pop .4s ease;
+  }
+  @keyframes ls-pop { 0% { transform: scale(.4); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+  .ls-spk {
+    background: var(--accent-l); border: 2px solid var(--accent-m); border-radius: 12px;
+    font-size: 18px; padding: 2px 10px; cursor: pointer; vertical-align: middle;
+  }
 </style>
 </head>
 <body>
@@ -601,10 +643,18 @@
     <button class="btn-mode btn-math" onclick="startMode('math')">
       <span class="icon">🍎</span> Math
     </button>
-    <button class="btn-mode btn-verbal" onclick="startMode('verbal')">
+    <button class="btn-mode btn-verbal" onclick="showWordTiers()">
       <span class="icon">📖</span> Words
     </button>
   </div>
+</div>
+
+<!-- ── SCREEN: reading tiers (Words) ── -->
+<div class="card hidden" id="screenTiers">
+  <h1 class="title">📖 Learn to Read</h1>
+  <p class="sub">Start at the bottom and climb! 🪜</p>
+  <div class="tier-list" id="tierList"></div>
+  <button class="btn-skip mt" onclick="goHome()">← Back</button>
 </div>
 
 <!-- ── SCREEN: quiz ── -->
@@ -667,6 +717,7 @@ let currentCorrect = "";  // correct answer for current question
 let sessionStartTime = null;   // when the current round started
 let questionStartTime = null;  // when the current question was shown
 let questionResults = [];      // [{question, correct, timeMs, type}] for summary
+let _sio = null;               // state for the sound-it-out (double reading) game
 
 // ── stars ──────────────────────────────────────────────────────────────────
 (function() {
@@ -686,7 +737,7 @@ let questionResults = [];      // [{question, correct, timeMs, type}] for summar
 
 // ── screens ────────────────────────────────────────────────────────────────
 function show(id) {
-  ["screenName","screenHome","screenQuiz","screenBoard"].forEach(s=>
+  ["screenName","screenHome","screenTiers","screenQuiz","screenBoard"].forEach(s=>
     document.getElementById(s).classList.add("hidden")
   );
   document.getElementById(id).classList.remove("hidden");
@@ -695,13 +746,38 @@ function show(id) {
 function goHome() {
   document.getElementById("backBtn").classList.add("hidden");
   document.getElementById("scoreBar").classList.add("hidden");
+  if (window.speechSynthesis) speechSynthesis.cancel();
   show("screenHome");
+}
+
+// ── reading tiers (Erik Hoel's game plan × Singapore NEL) ───────────────────
+const READING_TIERS = [
+  { tier: 1, icon: "🔤", name: "Letter Sounds",   blurb: "Each letter has a sound — sss, aah, t!" },
+  { tier: 2, icon: "🧩", name: "Sound It Out",    blurb: "Tap the letters, then say the whole word!" },
+  { tier: 3, icon: "🧱", name: "Words & Phrases", blurb: "Sight words, phrases and sentences." },
+  { tier: 4, icon: "✨", name: "Letter Teams",    blurb: "sh, ch, magic-e and word families." },
+  { tier: 5, icon: "🚀", name: "Reading Take-Off", blurb: "Little stories and tricky words." },
+  { tier: 0, icon: "🌱", name: "Warm-Up",          blurb: "Sounds, colours and opposites." },
+];
+
+function showWordTiers() {
+  document.getElementById("tierList").innerHTML = READING_TIERS.map(t => `
+    <button class="tier-card" onclick="startMode('verbal', ${t.tier})">
+      <span class="tier-icon">${t.icon}</span>
+      <span class="tier-body">
+        <span class="tier-name">${t.tier === 0 ? "" : "Tier " + t.tier + " · "}${t.name}</span>
+        <span class="tier-blurb">${t.blurb}</span>
+      </span>
+    </button>`).join("");
+  document.getElementById("backBtn").classList.add("hidden");
+  document.getElementById("scoreBar").classList.add("hidden");
+  show("screenTiers");
 }
 
 // ── name is hardcoded ──────────────────────────────────────────────────────
 
 // ── start mode ─────────────────────────────────────────────────────────────
-async function startMode(mode) {
+async function startMode(mode, tier) {
   sessionCorrect = 0; sessionTotal = 0; streak = 0; qIndex = 0; wrongCount = 0;
   sessionStartTime = Date.now(); questionResults = [];
   updateScoreBar();
@@ -709,9 +785,12 @@ async function startMode(mode) {
   document.getElementById("backBtn").classList.remove("hidden");
   document.getElementById("scoreBar").classList.remove("hidden");
   show("screenQuiz");
-  const res = await fetch(`/api/questions/${mode}?player_name=${encodeURIComponent(playerName)}`);
+  let url = `/api/questions/${mode}?player_name=${encodeURIComponent(playerName)}`;
+  if (tier !== undefined) url += `&tier=${tier}`;
+  const res = await fetch(url);
   questions = await res.json();
   questions._mode = mode;
+  questions._tier = tier;
   renderQuestion();
 }
 
@@ -943,6 +1022,73 @@ function renderQuestion() {
       <div class="opt-row">${q.options.map(o=>
         `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:18px;padding:14px 20px">${esc(o)}</button>`
       ).join("")}</div>`;
+
+  // ── Tier 1: letter → sound (succinct, with audio) ────────────────────────
+  } else if(q.type === "letter_sound") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <div class="ls-letter" onclick="speakPhoneme('${esc(q.sound)}')">${esc(q.letter)}</div>
+      <button class="btn-learn" onclick="speakPhoneme('${esc(q.sound)}')">🔊 Hear the sound</button>
+      <p class="q-text">Which one <b>starts</b> with this sound?</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:22px;padding:14px 18px">${esc(o)}</button>`
+      ).join("")}</div>`;
+    speakPhoneme(q.sound);
+
+  // ── Tier 2: the sound-it-out game (Hoel's "double reading") ──────────────
+  } else if(q.type === "sound_it_out") {
+    currentCorrect = q.answer;
+    _sio = { sounds: q.sounds, word: q.word, done: false, tapped: new Set() };
+    const tiles = q.sounds.map((s,i)=>
+      `<button class="ls-tile" id="tile${i}" onclick="soundTap(${i})">${esc(s[0])}</button>`
+    ).join("");
+    area.innerHTML = `
+      <p class="q-text" style="font-size:23px">${esc(q.sentence)}
+        <button class="ls-spk" onclick="speak('${esc(q.sentence.replace(/_+/g,' blank '))}')">🔊</button></p>
+      <p class="sub" style="margin:4px 0">Tap each letter to sound it out 👇</p>
+      <div class="ls-tiles">${tiles}</div>
+      <button class="btn-learn ls-sayword" id="sayWordBtn" onclick="sayWholeWord()">👉 Now say the whole word!</button>
+      <div id="sioConfirm"></div>`;
+
+  // ── Tier 3: phrases ──────────────────────────────────────────────────────
+  } else if(q.type === "phrase") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <p class="q-text" style="font-family:'Nunito',sans-serif;font-weight:800;font-size:30px">${esc(q.phrase)}
+        <button class="ls-spk" onclick="speak('${esc(q.phrase)}')">🔊</button></p>
+      <p class="q-text">Tap the picture that matches! 🖼️</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:48px;padding:12px 20px">${o}</button>`
+      ).join("")}</div>`;
+
+  // ── Tier 4: magic E ──────────────────────────────────────────────────────
+  } else if(q.type === "magic_e") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <div style="font-size:72px;margin:8px 0">${q.emoji}</div>
+      <p class="q-text">The <b>magic E</b> ✨ changes the word! Which one is this?</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:26px;padding:14px 22px;font-family:'Nunito',sans-serif;font-weight:800;letter-spacing:1px">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  // ── Tier 4: word families ────────────────────────────────────────────────
+  } else if(q.type === "word_family") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <div class="ls-letter" style="font-size:48px">${esc(q.family)}</div>
+      <p class="q-text">${esc(q.question)}</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:22px;padding:14px 18px;font-family:'Nunito',sans-serif;font-weight:800">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  // ── Tier 5: tricky (irregular) words ─────────────────────────────────────
+  } else if(q.type === "tricky_word") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <p class="q-text">${esc(q.question)}</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:24px;padding:14px 22px;font-family:'Nunito',sans-serif;font-weight:800">${esc(o)}</button>`
+      ).join("")}</div>`;
   }
 
   // Add skip button to every question
@@ -954,6 +1100,54 @@ function renderQuestion() {
 function skipQuestion() {
   qIndex++;
   renderQuestion();
+}
+
+// ── speech: words/sentences, and succinct single phonemes ───────────────────
+function speak(text, rate) {
+  if (!text || !window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.rate = rate || 0.8;
+  utter.pitch = 1.15;
+  utter.volume = 1;
+  const voices = speechSynthesis.getVoices();
+  const preferred = voices.find(v => /samantha|karen|victoria|fiona|moira/i.test(v.name))
+    || voices.find(v => v.lang.startsWith("en") && /female/i.test(v.name))
+    || voices.find(v => v.lang.startsWith("en"));
+  if (preferred) utter.voice = preferred;
+  speechSynthesis.speak(utter);
+}
+function speakPhoneme(p) { speak(p, 0.6); }
+
+// ── sound-it-out game: tap a letter to hear its sound (Hoel's "double reading")
+function soundTap(i) {
+  if(!_sio) return;
+  speakPhoneme(_sio.sounds[i][1]);
+  const tile = document.getElementById("tile" + i);
+  if(tile) tile.classList.add("tapped");
+  _sio.tapped.add(i);
+  if(_sio.tapped.size === _sio.sounds.length) {
+    const btn = document.getElementById("sayWordBtn");
+    if(btn) btn.classList.add("ready");
+  }
+}
+
+// ── say the whole word, then confirm with a picture (the graded step) ───────
+function sayWholeWord() {
+  if(!_sio || _sio.done) return;
+  _sio.done = true;
+  speak(_sio.word, 0.75);
+  const q = questions[qIndex];
+  const tilesWrap = document.querySelector(".ls-tiles");
+  if(tilesWrap) tilesWrap.insertAdjacentHTML("afterend",
+    `<div class="sio-word">${esc(_sio.word)}!</div>`);
+  const sb = document.getElementById("sayWordBtn");
+  if(sb) sb.classList.add("hidden");
+  document.getElementById("sioConfirm").innerHTML = `
+    <p class="q-text">Great reading! Now tap the picture for <b>${esc(_sio.word)}</b> 👇</p>
+    <div class="opt-row">${q.options.map(o=>
+      `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:48px;padding:12px 20px">${o}</button>`
+    ).join("")}</div>`;
 }
 
 function makeArithOpts(answer, qid) {
@@ -1070,6 +1264,7 @@ function showSummary() {
   const pct = sessionTotal ? Math.round((sessionCorrect/sessionTotal)*100) : 0;
   const totalMs = Date.now() - sessionStartTime;
   const mode = questions._mode;
+  const tier = questions._tier;
   const modeLabel = mode === "math" ? "🍎 Math" : "📖 Words";
   const avgMs = sessionTotal ? Math.round(totalMs / sessionTotal) : 0;
 
@@ -1119,7 +1314,8 @@ function showSummary() {
     </table>
 
     <div class="mt row">
-      <button class="btn-primary" onclick="startMode('${mode}')">Play again 🔄</button>
+      <button class="btn-primary" onclick="${tier !== undefined ? `startMode('${mode}', ${tier})` : `startMode('${mode}')`}">Play again 🔄</button>
+      ${mode === "verbal" ? `<button class="btn-primary" style="background:linear-gradient(135deg,#5eead4,#2dd4bf);color:#0f3b36" onclick="showWordTiers()">More tiers 🪜</button>` : ""}
       <button class="btn-primary" style="background:linear-gradient(135deg,#43e97b,#38f9d7);color:#065f46" onclick="goHome()">Home 🏠</button>
     </div>`;
   if(pct===100) confetti(60);
@@ -1321,8 +1517,30 @@ const tutorialBuilders = {
   word: buildTutorialWord,
   sound: buildTutorialSound,
   opposite: buildTutorialOpposite,
-  color: buildTutorialColor
+  color: buildTutorialColor,
+  letter_sound: buildTutorialWordHint,
+  sound_it_out: buildTutorialWordHint,
+  phrase: buildTutorialWordHint,
+  magic_e: buildTutorialWordHint,
+  word_family: buildTutorialWordHint,
+  tricky_word: buildTutorialWordHint
 };
+
+// Generic chalkboard for the new reading types: big cue + spoken hint + answer
+function buildTutorialWordHint(q) {
+  const cue = q.letter || q.word || q.family || q.phrase || "📖";
+  const ans = q.answer != null ? String(q.answer) : "";
+  return `
+    <div class="chalk-title chalk-text">📖 ✏️</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="${esc(q.hint || 'Let us read it together!')}">
+      <div class="chalk-big-num chalk-write" style="text-transform:lowercase">${esc(cue)}</div>
+    </div>
+    <div class="chalk-step" data-speak="The answer is ${esc(ans)}">
+      <div class="chalk-text" style="font-size:22px">${esc(q.hint || '')}</div>
+      <div class="chalk-text chalk-ans" style="font-size:30px;margin-top:8px">👉 ${esc(ans)}</div>
+    </div>`;
+}
 
 function showTutorial() {
   const q = questions[qIndex];

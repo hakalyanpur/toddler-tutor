@@ -71,10 +71,50 @@ All two-digit problems are **no-regrouping** (the ones column never exceeds 9), 
 
 ---
 
-## Literacy (97 questions in `verbal.json`)
+## Literacy (140 questions in `verbal.json`) — a tiered reading engine
+
+The **Words** section is served as a **tier progression** that fuses **Erik Hoel's
+"Teaching (very) early reading" game plan** (Parts 1–5) with the **NEL** literacy
+approach. The child climbs the ladder; the parent voices the precise sounds.
+Each question type maps to a tier (`TIER_BY_TYPE` in `main.py`), served via
+`GET /api/questions/verbal?tier=N`.
+
+### Hoel's principles applied
+- **Loving & grokking** — optimise for reading *for pleasure*, not "reading level."
+- **Skip blending; use "double reading"** — the **Tier 2 sound-it-out game** lays out a
+  word's letters as tappable tiles inside a context sentence; the child taps each to hear
+  its succinct sound, then says the whole word and confirms with a picture. We never drill
+  smooth blending.
+- **Letter → *sounds*, kept succinct** — the new `letter_sound` type and the spoken audio
+  follow "say /b/, not 'buh'." (Note: the older `phonics` MCQs still use 'buh/duh' option
+  text; the new sound-first types model the succinct form.)
+- **Context is confidence** — every sound-it-out word sits in a kid-relevant sentence.
+
+### Tier map (Hoel × NEL)
+
+| Tier | Name | Types | Skill |
+|---|---|---|---|
+| 0 | Warm-Up | `sound`, `opposite`, `color`, `word` | Oral language / vocabulary |
+| 1 | Letter Sounds | `letter_sound` (new, audio), `phonics` | Map letters to *sounds* |
+| 2 | Sound It Out | `sound_it_out` (new, interactive) | **Double reading** — the core engine |
+| 3 | Words & Phrases | `sight_word`, `phrase` (new), `spelling`, `sentence` | Sight words, phrases, sentences |
+| 4 | Letter Teams | `digraph`, `magic_e` (new), `word_family` (new), `rhyme` | Phonics rules: sh/ch/th, magic-E, families |
+| 5 | Reading Take-Off | `story`, `tricky_word` (new) | Comprehension + irregular words |
+
+Audio uses the browser's `speechSynthesis` (no assets/keys). TTS can't perfectly isolate
+stop consonants without a faint vowel, so the on-screen text shows the succinct form and
+the parent voices it (Hoel's parent-led 1:1 model).
+
+### Per-type counts
 
 | Topic | Count | Scope | Question Types |
 |---|---|---|---|
+| Letter sounds (new) | 14 | Sound-first letters (SATPIN +), spoken, succinct | `letter_sound` |
+| Sound it out (new) | 10 | Interactive double-reading CVC game with context sentence | `sound_it_out` |
+| Phrases (new) | 5 | Read a 2–3 word phrase, match the picture | `phrase` |
+| Magic E (new) | 5 | Silent-E changes the vowel (kit→kite, cap→cape) | `magic_e` |
+| Word families (new) | 5 | -at, -ig, -op, -all, -ar | `word_family` |
+| Tricky words (new) | 4 | Irregular sight words (said, was, you, are) | `tricky_word` |
 | Phonics | 15 | 10 letter sounds (b, d, f, g, k, m, n, p, s, t) + 5 CVC blending | `phonics` |
 | Sight words | 15 | Common high-frequency words (I, a, the, is, my, it, on, up, go, see, can, we, he, she, no) | `sight_word` |
 | Spelling | 12 | CVC words (cat, dog, sun, hat, bed, pig, cup, bus) + CCVC/CVCC (frog, jump, stop, clap) | `spelling` |

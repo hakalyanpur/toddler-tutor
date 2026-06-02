@@ -86,9 +86,28 @@ def _pick_questions(pool, mode, player_name, count=5):
 def get_math_questions(player_name: str = Query("")):
     return _pick_questions(MATH_Q, "math", player_name)
 
+# Reading tiers (Erik Hoel's game plan x Singapore NEL) — maps each question
+# type to a tier so the Words section can be served as a progression.
+TIER_BY_TYPE = {
+    # Tier 0 — Warm-Up (oral language & vocabulary)
+    "sound": 0, "opposite": 0, "color": 0, "word": 0,
+    # Tier 1 — Letter sounds
+    "letter_sound": 1, "phonics": 1,
+    # Tier 2 — Sound it out (double reading)
+    "sound_it_out": 2,
+    # Tier 3 — Words & phrases
+    "sight_word": 3, "phrase": 3, "spelling": 3, "sentence": 3,
+    # Tier 4 — Letter teams (phonics rules)
+    "digraph": 4, "magic_e": 4, "word_family": 4, "rhyme": 4,
+    # Tier 5 — Reading take-off
+    "story": 5, "tricky_word": 5,
+}
+
 @app.get("/api/questions/verbal")
-def get_verbal_questions(player_name: str = Query("")):
-    return _pick_questions(VERBAL_Q, "verbal", player_name)
+def get_verbal_questions(player_name: str = Query(""), tier: int = Query(None)):
+    pool = (VERBAL_Q if tier is None
+            else [q for q in VERBAL_Q if TIER_BY_TYPE.get(q["type"]) == tier])
+    return _pick_questions(pool, "verbal", player_name, count=6)
 
 # ── answer + progress ─────────────────────────────────────────────────────────
 @app.post("/api/answer")
