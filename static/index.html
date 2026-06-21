@@ -414,6 +414,7 @@
   .chalk-col .col-tens { color: rgba(120,200,255,.95); text-shadow: 0 0 6px rgba(120,200,255,.25); }
   .chalk-col .col-ones { color: rgba(255,235,120,.95); text-shadow: 0 0 6px rgba(255,235,120,.25); }
   .chalk-col .col-ans  { color: rgba(130,255,170,.95); text-shadow: 0 0 8px rgba(130,255,170,.3); }
+  .chalk-col .col-carry { font-size: 22px; color: rgba(255,170,90,.95); text-shadow: 0 0 6px rgba(255,170,90,.45); }
   .chalk-col .col-rule {
     grid-column: 1 / -1; height: 3px; width: 100%; margin: 3px 0;
     background: repeating-linear-gradient(90deg,
@@ -2565,6 +2566,49 @@ function buildTutorialAddition(q) {
       <div class="chalk-step" data-speak="Now the tens. ${aT} plus ${bT} is ${ansT}.">
         ${grid("all")}
         <div class="chalk-text chalk-write" style="font-size:24px;color:rgba(120,200,255,.95);margin-top:4px">🔵 ${aT} + ${bT} = ${ansT}</div>
+      </div>
+      <div class="chalk-step" data-speak="${a} plus ${b} equals ${ans}!">
+        ${eq(a, "+", b, ans)}
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  if (method === "carry") {
+    // Long-form column WITH regrouping — carry the ten. Builds on the no-carry
+    // column he already knows; the new idea is the carried 1.
+    const aT = Math.floor(a / 10), aO = a % 10;
+    const bT = Math.floor(b / 10), bO = b % 10;
+    const ansT = Math.floor(ans / 10), ansO = ans % 10;
+    const onesTotal = aO + bO;        // ≥ 10 — that's why we carry
+    const onesDigit = onesTotal % 10; // the digit we write under the ones
+    // `show`: "" (blank), "ones" (carried 1 + ones digit), "all" (full answer).
+    const grid = (show) => {
+      const carry = (show === "ones" || show === "all") ? `<span class="col-carry">1</span>` : "&nbsp;";
+      const rT = (show === "all") ? `<span class="col-ans">${ansT}</span>` : "&nbsp;";
+      const rO = (show === "ones" || show === "all") ? `<span class="col-ans">${onesDigit}</span>` : "&nbsp;";
+      return `
+        <div class="chalk-col-head"><span class="h-tens">tens</span><span class="h-ones">ones</span></div>
+        <div class="chalk-col">
+          <span></span><span>${carry}</span><span></span>
+          <span></span><span class="col-tens">${aT}</span><span class="col-ones">${aO}</span>
+          <span class="col-op">+</span><span class="col-tens">${bT}</span><span class="col-ones">${bO}</span>
+          <span class="col-rule"></span>
+          <span></span><span>${rT}</span><span>${rO}</span>
+        </div>`;
+    };
+    return `
+      <div class="chalk-title chalk-text">📋 Carry the Ten!</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="Stack them up. Tens under tens, ones under ones.">
+        ${grid("")}
+      </div>
+      <div class="chalk-step" data-speak="Add the ones. ${aO} plus ${bO} is ${onesTotal}. That's more than 9! Write the ${onesDigit}, and carry 1 ten over to the tens column.">
+        ${grid("ones")}
+        <div class="chalk-text chalk-write" style="font-size:22px;color:rgba(255,235,120,.95);margin-top:4px">🟡 ${aO} + ${bO} = ${onesTotal} → write ${onesDigit}, carry 1️⃣</div>
+      </div>
+      <div class="chalk-step" data-speak="Now the tens. The carried 1, plus ${aT} plus ${bT}, is ${ansT}.">
+        ${grid("all")}
+        <div class="chalk-text chalk-write" style="font-size:22px;color:rgba(120,200,255,.95);margin-top:4px">🔵 1️⃣ + ${aT} + ${bT} = ${ansT}</div>
       </div>
       <div class="chalk-step" data-speak="${a} plus ${b} equals ${ans}!">
         ${eq(a, "+", b, ans)}

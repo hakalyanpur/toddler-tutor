@@ -21,15 +21,16 @@ that teach the method, not just the answer.
 
 ---
 
-## Numeracy (164 questions in `math.json`)
+## Numeracy (184 questions in `math.json`)
 
 | Topic | Count | Scope | Question Types |
 |---|---|---|---|
 | Addition (1-digit) | 24 | Sums within 18 with strategy hints (count on, make 10, number bonds, doubles) | `addition` |
 | Addition (2-digit, no regroup) | 22 | **Two-digit addition within 100, no regrouping**: 2-digit + 1-digit, adding tens, and 2-digit + 2-digit. Taught with the mental "tens & ones" decompose strategy and the long-form column algorithm | `addition` |
 | Addition (crossing a ten) | 8 | **2-digit + 1-digit that cross a ten** (28+5, 47+6) — the near-10 / make-the-next-ten mental method: fill the bigger number up to the next ten using a number bond, then add the leftover | `addition` |
+| Addition (2-digit, with regroup / carry) | 8 | **2-digit + 2-digit that regroup**, sums within 100 (27+15, 48+39) — the written column algorithm *with carrying*: add the ones, write the ones digit, carry 1 ten into the tens column. The next rung above the no-carry column | `addition` |
 | Subtraction | 20 | Differences within 10 and 20, with strategy hints (count back, bridge 10, number bonds) | `subtraction` |
-| Patterns | 18 | Skip counting (+1, +2, +3, +5, +10), doubling, countdown, repeating sequences | `pattern` |
+| Patterns | 30 | Skip counting (+1 through +6, +10), doubling, countdown (−2, −3, −5, −10), and sequences that cross a ten — broadened for extra practice | `pattern` |
 | Shapes | 20 | 2D (triangle, circle, square, rectangle, oval, diamond) + 3D (sphere, cube, cylinder, cone) | `shape` |
 | Number ordering | 8 | Before/after/between numbers 1–20 | `number_order` |
 | Comparison | 8 | Which number is bigger, comparing within 20 | `bigger` |
@@ -56,6 +57,7 @@ Every arithmetic question includes a **method hint** showing HOW to solve it:
 | **Add tens** | Adding whole tens | "20 + 30: 2 tens + 3 tens = 5 tens = 50" |
 | **Near 10 (make the next ten)** | 2-digit + 1-digit crossing a ten | "28 + 5: 28 needs 2 to reach 30, split 5 into 2 and 3, then 30 + 3 = 33" |
 | **Column (long-form)** | Two-digit addition (written) | "Stack them, add the ones column first, then the tens column" |
+| **Carry the ten** | 2-digit + 2-digit that regroups (written) | "27 + 15: ones 7 + 5 = 12, write 2 carry 1; tens 1 + 2 + 1 = 4 → 42" |
 
 ### Two-Digit Addition Progression (Primary-1 reach for strong K1/K2)
 
@@ -66,6 +68,7 @@ All two-digit problems are **no-regrouping** (the ones column never exceeds 9), 
 2. **Adding whole tens** (e.g. 20 + 30) — `add_tens`
 3. **2-digit + 2-digit, no regroup** (e.g. 23 + 14) — `two_digit`: a single "Two Ways!" explainer that shows **both** techniques in sequence — the mental tens-&-ones method first (Singapore's emphasis), then the written column/stack method — reinforcing that the algorithm is just the written form of the mental strategy.
 4. **2-digit + 1-digit, crossing a ten** (e.g. 28 + 5, 47 + 6) — `near_10`: the make-the-next-ten mental method. This is the child's count-on instinct formalized — these *are* regrouping problems, done mentally (fill to the next ten, then add the leftover) rather than by a carried column.
+5. **2-digit + 2-digit, with regrouping** (e.g. 27 + 15, 48 + 39) — `carry`: the written column algorithm *with carrying*. Builds directly on step 3's no-carry column — the only new idea is that when the ones sum exceeds 9, you write the ones digit and carry 1 ten into the tens column.
 
 > **Pedagogical note:** Singapore math deliberately teaches mental calculation (number bonds, make-ten, decompose into tens & ones) *before* and *as the basis for* the standard column algorithm. The two-digit explainer mirrors this: head first, paper second.
 
@@ -139,6 +142,6 @@ the parent voices it (Hoel's parent-led 1:1 model).
 - **Writing practice** — letter/word tracing (needs different UI)
 - **Social-emotional** — identifying feelings, sharing, turn-taking
 - **Bilingual** — Mandarin vocabulary and characters
-- **Regrouping in the written column** — crossing a ten is now covered *mentally* via the near-10 method (2-digit + 1-digit). Still not covered: the written column algorithm with a carried "1", and 2-digit + 2-digit sums that regroup (e.g. 38 + 15)
+- **Regrouping into the hundreds** — written carry is now covered for 2-digit + 2-digit sums *within 100* (the `carry` set, e.g. 27 + 15, 48 + 39). Still not covered: sums that cross 100 (e.g. 68 + 57), and subtraction with regrouping (borrowing)
 - **Multiplication foundations** — groups of (2 groups of 3)
 - **Analog clock** — telling time to the hour
