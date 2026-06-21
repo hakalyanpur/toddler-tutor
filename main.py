@@ -16,6 +16,7 @@ def _load_questions(filename):
 
 MATH_Q = _load_questions("math.json")
 VERBAL_Q = _load_questions("verbal.json")
+LOGIC_Q = _load_questions("logic.json")
 
 
 # ── startup / shutdown ────────────────────────────────────────────────────────
@@ -35,7 +36,7 @@ def root():
 # ── schemas ───────────────────────────────────────────────────────────────────
 class AnswerPayload(BaseModel):
     player_name: str
-    mode: str        # "math" | "verbal"
+    mode: str        # "math" | "verbal" | "logic"
     question_id: str
     correct: bool
 
@@ -85,6 +86,10 @@ def _pick_questions(pool, mode, player_name, count=5):
 @app.get("/api/questions/math")
 def get_math_questions(player_name: str = Query("")):
     return _pick_questions(MATH_Q, "math", player_name)
+
+@app.get("/api/questions/logic")
+def get_logic_questions(player_name: str = Query("")):
+    return _pick_questions(LOGIC_Q, "logic", player_name)
 
 # Reading tiers (Erik Hoel's game plan x Singapore NEL) — maps each question
 # type to a tier so the Words section can be served as a progression.

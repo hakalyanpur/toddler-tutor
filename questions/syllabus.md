@@ -74,6 +74,31 @@ All two-digit problems are **no-regrouping** (the ones column never exceeds 9), 
 
 ---
 
+## Logic & Reasoning (35 questions in `logic.json`) — the "Logic" mode
+
+A separate **🧩 Logic** mode (`GET /api/questions/logic`), built to exercise the
+*reasoning* muscles — abstraction, structure, deduction — rather than calculation.
+The rationale: arithmetic fluency is the most-coachable slice of math and a weak
+predictor of higher-order mathematical talent; pattern/structure recognition,
+transitive reasoning, and "sit with a hard problem" disposition track far better
+to olympiad-style problem solving. This mode deliberately targets that gap.
+
+| Type | Count | Skill exercised | Example |
+|---|---|---|---|
+| `visual_pattern` | 8 | Structural pattern recognition (AB, AAB, ABC repeats) | 🔴🔵🔴🔵🔴 → ? |
+| `analogy` | 8 | Relational mapping (A is to B as C is to ?) | Sock→Foot, Glove→? (Hand) |
+| `odd_one_out` | 7 | Categorization by a *hidden* rule (living/non-living, even/odd, flies/swims) | 🌳 🌷 🌻 🪨 → 🪨 |
+| `deduction` | 7 | Constraint logic, transitive reasoning, likelihood | "Tom > Sam > Ben — who's tallest?" |
+| `sequence_logic` | 5 | Ordering by size / time / life-cycle | 🐭 → 🐱 → 🐶 → ? (🐘) |
+
+Each item carries a spoken `hint` that *talks through the reasoning* (the lesson is
+the why, not the answer). All types reuse a single generic chalkboard explainer
+(`buildTutorialLogic`). Surface-level recall (naming a fruit) is avoided in favour
+of items with a rule to *infer* — especially the even/odd, living/non-living,
+transitive-height, and likelihood items, which are the most reasoning-loaded.
+
+---
+
 ## Literacy (140 questions in `verbal.json`) — a tiered reading engine
 
 The **Words** section is served as a **tier progression** that fuses **Erik Hoel's

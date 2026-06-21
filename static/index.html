@@ -89,6 +89,7 @@
   .btn-mode .icon { font-size: 34px; }
   .btn-math   { background: linear-gradient(135deg, #14b8a6, #0d9488); }
   .btn-verbal { background: linear-gradient(135deg, #d99a52, #c2803a); color: #4a2f10; }
+  .btn-logic  { background: linear-gradient(135deg, #6f9fc4, #4f7da6); color: #0f2a3d; }
 
   .btn-board  { background: linear-gradient(135deg, #ffb347, #ff8c42); color: #5a2e00; }
 
@@ -647,6 +648,9 @@
     <button class="btn-mode btn-verbal" onclick="showWordTiers()">
       <span class="icon">📖</span> Words
     </button>
+    <button class="btn-mode btn-logic" onclick="startMode('logic')">
+      <span class="icon">🧩</span> Logic
+    </button>
   </div>
 </div>
 
@@ -924,6 +928,58 @@ function renderQuestion() {
       <p class="q-text">${esc(q.question)}</p>
       <div class="opt-row">${q.options.map(o=>
         `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:16px;padding:14px 18px">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "visual_pattern") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <p class="q-text">What comes next? 🧩</p>
+      <div class="emoji-grid" style="gap:6px;font-size:40px">${q.seq.map((s,i)=>
+        `<span class="big-emoji" style="animation-delay:${i*0.05}s">${s}</span>`
+      ).join("")}<span class="big-emoji" style="opacity:.45">❓</span></div>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:38px;padding:12px 22px">${o}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "analogy") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <p class="q-text">Finish the pair! 🔗</p>
+      <div style="display:flex;flex-direction:column;gap:12px;align-items:center;margin:12px 0">
+        <div style="font-size:22px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:42px">${q.a}</span> ${esc(q.a_label)} <span style="color:var(--purple);font-size:26px">→</span> <span style="font-size:42px">${q.b}</span> <b>${esc(q.b_label)}</b>
+        </div>
+        <div style="font-size:22px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:42px">${q.c}</span> ${esc(q.c_label)} <span style="color:var(--purple);font-size:26px">→</span> <span style="font-size:42px">❓</span>
+        </div>
+      </div>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:20px;padding:14px 22px">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "odd_one_out") {
+    currentCorrect = q.answer;
+    area.innerHTML = `
+      <p class="q-text">Which one does <b>NOT</b> belong? 🤔</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:40px;padding:14px 24px">${o}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "deduction") {
+    currentCorrect = String(q.answer);
+    area.innerHTML = `
+      <p class="q-text">🕵️ ${esc(q.question)}</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(String(o))}','${esc(String(q.answer))}','${q.id}')" style="font-size:24px;padding:14px 24px">${esc(String(o))}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "sequence_logic") {
+    currentCorrect = String(q.answer);
+    area.innerHTML = `
+      <p class="q-text">${esc(q.question)}</p>
+      ${q.display ? `<div style="font-size:40px;margin:12px 0;line-height:1.3">${q.display}</div>` : ""}
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(String(o))}','${esc(String(q.answer))}','${q.id}')" style="font-size:36px;padding:12px 22px">${o}</button>`
       ).join("")}</div>`;
 
   } else if(q.type === "rhyme") {
@@ -1266,7 +1322,7 @@ function showSummary() {
   const totalMs = Date.now() - sessionStartTime;
   const mode = questions._mode;
   const tier = questions._tier;
-  const modeLabel = mode === "math" ? "🍎 Math" : "📖 Words";
+  const modeLabel = mode === "math" ? "🍎 Math" : mode === "logic" ? "🧩 Logic" : "📖 Words";
   const avgMs = sessionTotal ? Math.round(totalMs / sessionTotal) : 0;
 
   // Star rating: 5/5=3stars, 4/5=2stars, <=3/5=1star
@@ -1332,7 +1388,7 @@ async function showBoard() {
   pa.innerHTML = `<h3 style="font-family:'Fredoka One',cursive;color:var(--purple);margin-bottom:8px">${esc(playerName)}'s Progress</h3>`;
   for(const [mode, stat] of Object.entries(prData.progress||{})) {
     const pct = stat.total ? Math.round(stat.correct/stat.total*100) : 0;
-    const modeLabel = mode === "math" ? "🍎 Math" : "📖 Words";
+    const modeLabel = mode === "math" ? "🍎 Math" : mode === "logic" ? "🧩 Logic" : "📖 Words";
     pa.innerHTML += `
       <div class="progress-block">
         <h3>${modeLabel} — ${stat.correct}/${stat.total} (${pct}%)</h3>
@@ -1524,8 +1580,39 @@ const tutorialBuilders = {
   phrase: buildTutorialWordHint,
   magic_e: buildTutorialWordHint,
   word_family: buildTutorialWordHint,
-  tricky_word: buildTutorialWordHint
+  tricky_word: buildTutorialWordHint,
+  visual_pattern: buildTutorialLogic,
+  analogy: buildTutorialLogic,
+  odd_one_out: buildTutorialLogic,
+  deduction: buildTutorialLogic,
+  sequence_logic: buildTutorialLogic
 };
+
+// Generic chalkboard for the Logic types — restate the puzzle, talk through the
+// reasoning (the spoken hint IS the lesson), then reveal the answer.
+function buildTutorialLogic(q) {
+  const ans = q.answer != null ? String(q.answer) : "";
+  // A visual cue for the puzzle, by type.
+  let cue = "🧩";
+  if (q.type === "visual_pattern") cue = (q.seq || []).join(" ") + " ❓";
+  else if (q.type === "analogy")   cue = `${q.a} → ${q.b}<br>${q.c} → ❓`;
+  else if (q.type === "odd_one_out") cue = (q.options || []).join("  ");
+  else if (q.type === "sequence_logic") cue = q.display || "🧩";
+  else if (q.type === "deduction") cue = "🕵️";
+  return `
+    <div class="chalk-title chalk-text">🧩 Think it through!</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="${esc(q.question || 'Look closely at the puzzle.')}">
+      <div class="chalk-text chalk-write" style="font-size:30px;line-height:1.4">${cue}</div>
+    </div>
+    <div class="chalk-step" data-speak="${esc(q.hint || '')}">
+      <div class="chalk-text" style="font-size:20px;line-height:1.4">${esc(q.hint || '')}</div>
+    </div>
+    <div class="chalk-step" data-speak="So the answer is ${esc(ans)}!">
+      <div class="chalk-text chalk-ans chalk-write" style="font-size:40px;margin-top:6px">👉 ${esc(ans)}</div>
+      <div style="font-size:46px">🎉</div>
+    </div>`;
+}
 
 // Generic chalkboard for the new reading types: big cue + spoken hint + answer
 function buildTutorialWordHint(q) {

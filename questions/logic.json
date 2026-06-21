@@ -1,0 +1,41 @@
+[
+  {"id": "vp1", "type": "visual_pattern", "seq": ["🔴","🔵","🔴","🔵","🔴"], "options": ["🔵","🔴","🟡"], "answer": "🔵", "hint": "Red, blue, red, blue — it takes turns! After red comes blue."},
+  {"id": "vp2", "type": "visual_pattern", "seq": ["🟢","🟢","🟡","🟢","🟢","🟡","🟢","🟢"], "options": ["🟡","🟢","🔴"], "answer": "🟡", "hint": "Two greens, then a yellow — over and over. After two greens comes yellow!"},
+  {"id": "vp3", "type": "visual_pattern", "seq": ["⭐","🌙","⭐","🌙","⭐"], "options": ["🌙","⭐","☀️"], "answer": "🌙", "hint": "Star, moon, star, moon — it switches each time. After a star comes the moon!"},
+  {"id": "vp4", "type": "visual_pattern", "seq": ["🐶","🐱","🐭","🐶","🐱"], "options": ["🐭","🐶","🐱"], "answer": "🐭", "hint": "Dog, cat, mouse — then it starts again! After cat comes the mouse."},
+  {"id": "vp5", "type": "visual_pattern", "seq": ["🔺","🔺","🔵","🔺","🔺","🔵","🔺","🔺"], "options": ["🔵","🔺","🟩"], "answer": "🔵", "hint": "Two triangles, then a circle. After two triangles comes the circle!"},
+  {"id": "vp6", "type": "visual_pattern", "seq": ["👏","✋","👏","✋","👏"], "options": ["✋","👏","👍"], "answer": "✋", "hint": "Clap, open, clap, open — it alternates. After a clap comes the open hand!"},
+  {"id": "vp7", "type": "visual_pattern", "seq": ["🍎","🍎","🍌","🍎","🍎","🍌","🍎"], "options": ["🍎","🍌","🍇"], "answer": "🍎", "hint": "Apple, apple, banana — over and over. We just had a banana, so next is an apple!"},
+  {"id": "vp8", "type": "visual_pattern", "seq": ["🔶","🔷","🔶","🔷","🔶","🔷"], "options": ["🔶","🔷","🔴"], "answer": "🔶", "hint": "Orange, blue, orange, blue — it takes turns. After blue comes orange!"},
+
+  {"id": "an1", "type": "analogy", "a": "🧦", "a_label": "Sock", "b": "🦶", "b_label": "Foot", "c": "🧤", "c_label": "Glove", "options": ["Hand","Head","Knee"], "answer": "Hand", "hint": "A sock goes on your foot, so a glove goes on your… hand!"},
+  {"id": "an2", "type": "analogy", "a": "🐄", "a_label": "Cow", "b": "🥛", "b_label": "Milk", "c": "🐔", "c_label": "Hen", "options": ["Egg","Wool","Honey"], "answer": "Egg", "hint": "A cow gives us milk, so a hen gives us… an egg!"},
+  {"id": "an3", "type": "analogy", "a": "☀️", "a_label": "Day", "b": "🌙", "b_label": "Night", "c": "🔥", "c_label": "Hot", "options": ["Cold","Warm","Wet"], "answer": "Cold", "hint": "Day is the opposite of night, so hot is the opposite of… cold!"},
+  {"id": "an4", "type": "analogy", "a": "🐦", "a_label": "Bird", "b": "🪹", "b_label": "Nest", "c": "🐝", "c_label": "Bee", "options": ["Hive","Web","Cave"], "answer": "Hive", "hint": "A bird lives in a nest, so a bee lives in a… hive!"},
+  {"id": "an5", "type": "analogy", "a": "🚗", "a_label": "Car", "b": "🛣️", "b_label": "Road", "c": "🚂", "c_label": "Train", "options": ["Tracks","Sky","Water"], "answer": "Tracks", "hint": "A car drives on a road, so a train rides on… tracks!"},
+  {"id": "an6", "type": "analogy", "a": "🐟", "a_label": "Fish", "b": "💧", "b_label": "Water", "c": "🐦", "c_label": "Bird", "options": ["Sky","Ground","Sea"], "answer": "Sky", "hint": "A fish swims in water, so a bird flies in the… sky!"},
+  {"id": "an7", "type": "analogy", "a": "👁️", "a_label": "Eye", "b": "👀", "b_label": "See", "c": "👂", "c_label": "Ear", "options": ["Hear","Smell","Talk"], "answer": "Hear", "hint": "We see with our eyes, so we hear with our… ears!"},
+  {"id": "an8", "type": "analogy", "a": "✏️", "a_label": "Pencil", "b": "✍️", "b_label": "Write", "c": "✂️", "c_label": "Scissors", "options": ["Cut","Draw","Glue"], "answer": "Cut", "hint": "A pencil is for writing, so scissors are for… cutting!"},
+
+  {"id": "oo1", "type": "odd_one_out", "options": ["🍎","🍌","🍊","🐶"], "answer": "🐶", "hint": "Apple, banana, orange are all FRUITS. A dog is an animal — it doesn't belong!"},
+  {"id": "oo2", "type": "odd_one_out", "options": ["🚗","🚙","🚌","✈️"], "answer": "✈️", "hint": "Car, jeep, bus all drive on the ROAD. A plane flies in the sky — it's different!"},
+  {"id": "oo3", "type": "odd_one_out", "options": ["🐟","🐙","🦀","🐦"], "answer": "🐦", "hint": "Fish, octopus, crab all live in the WATER. A bird lives in the air — it's the odd one!"},
+  {"id": "oo4", "type": "odd_one_out", "options": ["2","4","6","5"], "answer": "5", "hint": "2, 4, 6 are even — you can count them by 2s. 5 is odd, so it doesn't fit!"},
+  {"id": "oo5", "type": "odd_one_out", "options": ["🌳","🌷","🌻","🪨"], "answer": "🪨", "hint": "A tree, a tulip, a sunflower are all ALIVE and grow. A rock is not alive — it's different!"},
+  {"id": "oo6", "type": "odd_one_out", "options": ["🐝","🦋","🐞","🐠"], "answer": "🐠", "hint": "A bee, butterfly, ladybug all FLY. A fish swims — it's the odd one out!"},
+  {"id": "oo7", "type": "odd_one_out", "options": ["🥕","🥦","🌽","🍓"], "answer": "🍓", "hint": "Carrot, broccoli, corn are VEGETABLES. A strawberry is a fruit — it doesn't belong!"},
+
+  {"id": "de1", "type": "deduction", "question": "I am a number. I am bigger than 5 AND smaller than 7. What number am I?", "options": [5, 6, 7, 8], "answer": 6, "hint": "Bigger than 5 means 6, 7, 8… Smaller than 7 means it can't be 7. Only 6 fits both!"},
+  {"id": "de2", "type": "deduction", "question": "I am a number between 8 and 10. What number am I?", "options": [8, 9, 10, 11], "answer": 9, "hint": "Between 8 and 10 means right in the middle — that's 9!"},
+  {"id": "de3", "type": "deduction", "question": "I say 'moo' and I give milk. What animal am I?", "options": ["Cow","Dog","Cat"], "answer": "Cow", "hint": "Only one animal both says 'moo' AND gives milk — the cow!"},
+  {"id": "de4", "type": "deduction", "question": "I am yellow, I am a fruit, and monkeys love me. What am I?", "options": ["Banana","Apple","Grapes"], "answer": "Banana", "hint": "Yellow + fruit + monkeys love it — all three point to the banana!"},
+  {"id": "de5", "type": "deduction", "question": "Tom is taller than Sam. Sam is taller than Ben. Who is the TALLEST?", "options": ["Tom","Sam","Ben"], "answer": "Tom", "hint": "Tom is taller than Sam, and Sam is taller than Ben — so Tom is taller than everyone. Tom is tallest!"},
+  {"id": "de6", "type": "deduction", "question": "A bag has 3 red balls and 1 blue ball. You grab one without looking. Which color will you PROBABLY get?", "options": ["Red","Blue"], "answer": "Red", "hint": "There are way more red balls (3) than blue (1), so red is much more likely!"},
+  {"id": "de7", "type": "deduction", "question": "I have 4 legs, I say 'woof', and I am a pet. What am I?", "options": ["Dog","Bird","Fish"], "answer": "Dog", "hint": "4 legs + says 'woof' + a pet — all the clues point to a dog!"},
+
+  {"id": "sq1", "type": "sequence_logic", "question": "Each animal is BIGGER than the last. Which one comes next?", "display": "🐭 → 🐱 → 🐶 → ❓", "options": ["🐘","🐜","🐭"], "answer": "🐘", "hint": "Mouse, cat, dog — getting bigger each time! The biggest one next is the elephant 🐘."},
+  {"id": "sq2", "type": "sequence_logic", "question": "What comes FIRST in a butterfly's life?", "display": "❓ → 🐛 → 🦋", "options": ["🥚","🦋","🐝"], "answer": "🥚", "hint": "A butterfly starts as a tiny egg 🥚, then a caterpillar 🐛, then a butterfly 🦋!"},
+  {"id": "sq3", "type": "sequence_logic", "question": "Morning, then noon… what comes next in the day?", "display": "🌅 → ☀️ → ❓", "options": ["🌙","🌅","🍳"], "answer": "🌙", "hint": "Morning sun rises, the sun is high at noon, then night comes — the moon 🌙!"},
+  {"id": "sq4", "type": "sequence_logic", "question": "A plant grows bigger. What is the LAST, biggest stage?", "display": "🌱 → 🌿 → ❓", "options": ["🌳","🌰","🍂"], "answer": "🌳", "hint": "A seedling grows into a small plant, then into a big tree 🌳!"},
+  {"id": "sq5", "type": "sequence_logic", "question": "A person grows up. What comes next?", "display": "👶 → 🧒 → ❓", "options": ["🧑","👶","🐣"], "answer": "🧑", "hint": "A baby grows into a kid, and a kid grows into a grown-up 🧑!"}
+]
