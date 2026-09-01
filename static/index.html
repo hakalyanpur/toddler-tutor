@@ -515,6 +515,50 @@
       rgba(255,200,100,.6) 4px);
     box-shadow: 0 0 3px rgba(255,200,100,.2);
   }
+  /* the ⬜ placeholder in a missing-number equation, drawn instead of typeset */
+  .blank-box {
+    display: inline-block; width: 30px; height: 30px; vertical-align: -5px;
+    border: 2px dashed var(--accent-m); border-radius: 7px; background: var(--accent-l);
+  }
+  .chalk-blank {
+    display: inline-block; width: 26px; height: 26px; vertical-align: -4px;
+    border: 2px dashed rgba(255,235,120,.8); border-radius: 6px;
+  }
+  /* bar model (Singapore part-whole / comparison) */
+  .chalk-bars { max-width: 320px; margin: 10px auto; }
+  .chalk-bar-line { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+  .chalk-bar-label {
+    flex: none; width: 62px; text-align: right; font-size: 13px;
+    color: rgba(255,255,255,.65);
+  }
+  .chalk-bar-row { display: flex; flex: 1; gap: 3px; }
+  .chalk-bar {
+    height: 34px; min-width: 34px;
+    border: 2px solid rgba(255,255,255,.55); border-radius: 4px;
+    background: rgba(255,255,255,.06);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fredoka One', cursive; font-size: 19px;
+    color: rgba(255,255,255,.9);
+  }
+  .chalk-bar.part-a { border-color: rgba(120,200,255,.75); color: rgba(120,200,255,.95); }
+  .chalk-bar.part-b { border-color: rgba(255,235,120,.75); color: rgba(255,235,120,.95); }
+  .chalk-bar.unknown {
+    border-style: dashed; border-color: rgba(130,255,170,.85);
+    color: rgba(130,255,170,.95);
+  }
+  .chalk-brace { display: flex; align-items: center; gap: 6px; margin: 2px 0 4px; }
+  .chalk-brace .brace-arm { flex: 1; height: 2px; background: rgba(130,255,170,.45); }
+  .chalk-brace .brace-val {
+    font-family: 'Fredoka One', cursive; font-size: 20px;
+    color: rgba(130,255,170,.95); padding: 0 6px;
+  }
+  /* balance scale (both sides must weigh the same) */
+  .chalk-balance { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 12px 0; }
+  .chalk-pan {
+    border: 2px solid rgba(255,255,255,.5); border-radius: 10px; padding: 8px 14px;
+    font-family: 'Fredoka One', cursive; font-size: 24px; color: rgba(255,255,255,.9);
+  }
+  .chalk-pan.solved { border-color: rgba(130,255,170,.8); color: rgba(130,255,170,.95); }
   /* pattern arrows */
   .chalk-arrow-row {
     display: flex; align-items: center; justify-content: center; gap: 0; margin: 10px 0;
@@ -814,6 +858,11 @@ function esc(s) {
   return d.innerHTML;
 }
 
+// Renders a "7 + ⬜ = 10" display, swapping the placeholder for a drawn box.
+function withBlank(display, cls) {
+  return esc(display).split("⬜").join(`<span class="${cls}"></span>`);
+}
+
 // ── render question ────────────────────────────────────────────────────────
 function renderQuestion() {
   if(qIndex >= questions.length) { showSummary(); return; }
@@ -928,6 +977,29 @@ function renderQuestion() {
       <p class="q-text">${esc(q.question)}</p>
       <div class="opt-row">${q.options.map(o=>
         `<button class="btn-answer" onclick="checkAnswer('${esc(o)}','${esc(q.answer)}','${q.id}')" style="font-size:16px;padding:14px 18px">${esc(o)}</button>`
+      ).join("")}</div>`;
+
+  } else if(q.type === "word_problem") {
+    currentCorrect = String(q.answer);
+    area.innerHTML = `
+      <div style="font-size:44px;margin:2px 0">${q.emoji}</div>
+      <p class="q-text" style="font-size:19px;line-height:1.5;max-width:420px;margin:0 auto">${esc(q.story)}</p>
+      <div class="opt-row">${makeArithOpts(q.answer, q.id)}</div>`;
+
+  } else if(q.type === "missing_number") {
+    currentCorrect = String(q.answer);
+    area.innerHTML = `
+      <p class="q-text">What fits in the box? 🧠</p>
+      <p style="font-size:34px;margin:12px 0;font-family:'Fredoka One',cursive;color:var(--accent)">${withBlank(q.display, "blank-box")}</p>
+      <div class="opt-row">${makeArithOpts(q.answer, q.id)}</div>`;
+
+  } else if(q.type === "number_riddle") {
+    currentCorrect = String(q.answer);
+    area.innerHTML = `
+      <div style="font-size:40px;margin:2px 0">🕵️</div>
+      <p class="q-text" style="font-size:19px;line-height:1.5;max-width:420px;margin:0 auto">${esc(q.question)}</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(String(o))}','${esc(String(q.answer))}','${q.id}')" style="font-size:24px;padding:14px 22px">${esc(String(o))}</button>`
       ).join("")}</div>`;
 
   } else if(q.type === "visual_pattern") {
@@ -1564,6 +1636,9 @@ const tutorialBuilders = {
   positional: buildTutorialPositional,
   time: buildTutorialTime,
   money: buildTutorialMoney,
+  word_problem: buildTutorialWordProblem,
+  missing_number: buildTutorialMissingNumber,
+  number_riddle: buildTutorialLogic,
   phonics: buildTutorialPhonics,
   digraph: buildTutorialDigraph,
   spelling: buildTutorialSpelling,
@@ -1599,6 +1674,7 @@ function buildTutorialLogic(q) {
   else if (q.type === "odd_one_out") cue = (q.options || []).join("  ");
   else if (q.type === "sequence_logic") cue = q.display || "🧩";
   else if (q.type === "deduction") cue = "🕵️";
+  else if (q.type === "number_riddle") cue = "🔢 🕵️";
   return `
     <div class="chalk-title chalk-text">🧩 Think it through!</div>
     <div class="chalk-line" style="width:60%"></div>
@@ -1840,6 +1916,33 @@ function buildTutorialSubtraction(q) {
         </div>
       </div>
       <div class="chalk-step" data-speak="${a} minus ${b} equals ${ans}!">
+        ${eq(a, "−", b, ans)}
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  if (method === "split_tens") {
+    // Two-digit subtraction, no regrouping: handle tens and ones separately.
+    const aT = Math.floor(a / 10) * 10, aO = a % 10;
+    const bT = Math.floor(b / 10) * 10, bO = b % 10;
+    const tens = aT - bT, ones = aO - bO;
+    return `
+      <div class="chalk-title chalk-text">🔟 &amp; 1️⃣</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="Split each number into tens and ones. ${a} is ${aT} and ${aO}. ${b} is ${bT} and ${bO}.">
+        <div class="chalk-text chalk-write" style="font-size:22px">
+          <span class="col-tens" style="color:rgba(120,200,255,.95)">${aT}</span> + <span style="color:rgba(255,235,120,.95)">${aO}</span>
+          &nbsp;&nbsp;−&nbsp;&nbsp;
+          <span style="color:rgba(120,200,255,.95)">${bT}</span> + <span style="color:rgba(255,235,120,.95)">${bO}</span>
+        </div>
+      </div>
+      <div class="chalk-step" data-speak="Tens first. ${aT} take away ${bT} is ${tens}.">
+        <div class="chalk-text chalk-write" style="font-size:24px;color:rgba(120,200,255,.95)">🔵 ${aT} − ${bT} = ${tens}</div>
+      </div>
+      <div class="chalk-step" data-speak="Now the ones. ${aO} take away ${bO} is ${ones}.">
+        <div class="chalk-text chalk-write" style="font-size:24px;color:rgba(255,235,120,.95)">🟡 ${aO} − ${bO} = ${ones}</div>
+      </div>
+      <div class="chalk-step" data-speak="Put them back together. ${tens} and ${ones} is ${ans}!">
         ${eq(a, "−", b, ans)}
         <div style="font-size:48px">🎉</div>
       </div>`;
@@ -2703,6 +2806,78 @@ function buildTutorialAddition(q) {
       </div>`;
   }
 
+  if (method === "three_addends") {
+    // Adding three numbers: hunt for the pair that makes 10, add it first.
+    const nums = [a, b, q.c];
+    let pair = null, rest = null;
+    for (let i = 0; i < 3 && !pair; i++) {
+      for (let j = i + 1; j < 3; j++) {
+        if (nums[i] + nums[j] === 10) { pair = [nums[i], nums[j]]; rest = nums[3 - i - j]; break; }
+      }
+    }
+    const chips = highlight => nums.map(n => {
+      const inPair = pair && highlight && (n === pair[0] || n === pair[1]);
+      return `<span class="chalk-arrow-num ${inPair ? "unknown" : ""}">${n}</span>`;
+    }).join('<span class="chalk-plus-sign" style="font-size:24px">+</span>');
+
+    if (!pair) {
+      // No ten to find — just add left to right.
+      const mid = a + b;
+      return `
+        <div class="chalk-title chalk-text">➕ ➕</div>
+        <div class="chalk-line" style="width:60%"></div>
+        <div class="chalk-step" data-speak="Three numbers! Add them two at a time.">
+          <div class="chalk-arrow-row chalk-write-slow">${chips(false)}</div>
+        </div>
+        <div class="chalk-step" data-speak="First ${a} plus ${b} is ${mid}.">
+          <div class="chalk-equation chalk-write"><span>${a}</span> <span class="chalk-op">+</span> <span>${b}</span> <span class="chalk-op">=</span> <span class="chalk-ans">${mid}</span></div>
+        </div>
+        <div class="chalk-step" data-speak="Then ${mid} plus ${q.c} equals ${ans}!">
+          <div class="chalk-equation chalk-write"><span>${mid}</span> <span class="chalk-op">+</span> <span>${q.c}</span> <span class="chalk-op">=</span> <span class="chalk-ans">${ans}</span></div>
+          <div style="font-size:48px">🎉</div>
+        </div>`;
+    }
+
+    return `
+      <div class="chalk-title chalk-text">🔟 first!</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="Three numbers. You may add them in ANY order — so hunt for two that make ten.">
+        <div class="chalk-arrow-row chalk-write-slow">${chips(false)}</div>
+      </div>
+      <div class="chalk-step" data-speak="${pair[0]} and ${pair[1]} make ten!">
+        <div class="chalk-arrow-row chalk-write-slow">${chips(true)}</div>
+        <div class="chalk-equation chalk-write"><span>${pair[0]}</span> <span class="chalk-op">+</span> <span>${pair[1]}</span> <span class="chalk-op">=</span> <span class="chalk-ans">10</span></div>
+      </div>
+      <div class="chalk-step" data-speak="Now ten plus ${rest} equals ${ans}!">
+        <div class="chalk-equation chalk-write"><span>10</span> <span class="chalk-op">+</span> <span>${rest}</span> <span class="chalk-op">=</span> <span class="chalk-ans">${ans}</span></div>
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
+  if (method === "near_doubles") {
+    // 6 + 7 is one more than double 6 — lean on the double you already know.
+    const small = Math.min(a, b), dbl = small * 2;
+    return `
+      <div class="chalk-title chalk-text">🪞 + 1️⃣</div>
+      <div class="chalk-line" style="width:60%"></div>
+      <div class="chalk-step" data-speak="You already know double ${small}. ${small} and ${small} is ${dbl}.">
+        <div style="display:flex;align-items:center;justify-content:center;gap:16px">
+          <div class="chalk-big-emoji">${makeEmoji(small, eA)}</div>
+          <span class="chalk-divider">|</span>
+          <div class="chalk-big-emoji">${makeEmoji(small, eA)}</div>
+        </div>
+        <div class="chalk-equation chalk-write"><span>${small}</span> <span class="chalk-op">+</span> <span>${small}</span> <span class="chalk-op">=</span> <span class="chalk-ans">${dbl}</span></div>
+      </div>
+      <div class="chalk-step" data-speak="But one of our numbers is ${small + 1} — that is one MORE. So add one more.">
+        <div class="chalk-big-emoji" style="font-size:36px">${makeEmoji(small, eA)} <span style="opacity:.55">${eB}</span></div>
+        <div class="chalk-text chalk-green chalk-write" style="font-size:22px">${dbl} + 1</div>
+      </div>
+      <div class="chalk-step" data-speak="${a} plus ${b} equals ${ans}!">
+        ${eq(a, "+", b, ans)}
+        <div style="font-size:48px">🎉</div>
+      </div>`;
+  }
+
   // Fallback
   return `
     <div class="chalk-title chalk-text">➕</div>
@@ -2720,6 +2895,165 @@ function buildTutorialAddition(q) {
       ${eq(a, "+", b, ans)}
       <div style="font-size:48px">🎉</div>
     </div>`;
+}
+
+// ── Word problem tutorial (Singapore bar model) ─────────────────────────
+// The bars show the STRUCTURE of the story before any arithmetic happens:
+//   part-whole   [ 6 ][ 5 ]  with the whole braced underneath  = ?
+//   missing part [ 5 ][ ? ]  with the known whole braced       = 12
+//   comparison   [ 9      ]  vs  [ 4 ][ ? ]  — the gap is the answer
+function buildTutorialWordProblem(q) {
+  const ans = q.answer;
+  const bar = (val, cls, flex) => `<div class="chalk-bar ${cls}" style="flex:${flex}">${val}</div>`;
+  // The label column only exists when a bar is named, so unlabelled bars
+  // (part-whole) stay centred instead of sitting 62px to the right.
+  const line = (label, inner) =>
+    `<div class="chalk-bar-line">${label ? `<span class="chalk-bar-label">${esc(label)}</span>` : ""}<div class="chalk-bar-row">${inner}</div></div>`;
+  const brace = val => `<div class="chalk-brace"><span class="brace-arm"></span><span class="brace-val">${val}</span><span class="brace-arm"></span></div>`;
+  const eq = (x, op, y, r) =>
+    `<div class="chalk-equation chalk-write"><span>${x}</span> <span class="chalk-op">${op}</span> <span>${y}</span> <span class="chalk-op">=</span> <span class="chalk-ans">${r}</span></div>`;
+
+  const storyStep = `
+    <div class="chalk-step" data-speak="${esc(q.story)}">
+      <div style="font-size:44px">${q.emoji}</div>
+      <div class="chalk-text" style="font-size:19px;line-height:1.45">${esc(q.story)}</div>
+    </div>`;
+  const head = `
+    <div class="chalk-title chalk-text">📊 ${q.emoji}</div>
+    <div class="chalk-line" style="width:60%"></div>`;
+  const hintStep = extra => `
+    <div class="chalk-step" data-speak="${esc(q.hint)}">
+      <div class="chalk-text" style="font-size:19px;line-height:1.4">${esc(q.hint)}</div>
+      ${extra}
+      <div style="font-size:44px">🎉</div>
+    </div>`;
+
+  if (q.model === "part_whole") {
+    const bars = line(null, bar(q.a, "part-a", q.a) + bar(q.b, "part-b", q.b)) + brace("?");
+    return head + storyStep + `
+      <div class="chalk-step" data-speak="Two parts: ${q.a} and ${q.b}. Together they make the whole.">
+        <div class="chalk-bars chalk-write-slow">${bars}</div>
+      </div>` + hintStep(eq(q.a, "+", q.b, ans));
+  }
+
+  if (q.model === "missing_part") {
+    const bars = line(null, bar(q.part, "part-a", q.part) + bar("?", "unknown", Math.max(1, q.whole - q.part)))
+               + brace(q.whole);
+    return head + storyStep + `
+      <div class="chalk-step" data-speak="The whole is ${q.whole}. One part is ${q.part}. The other part is missing.">
+        <div class="chalk-bars chalk-write-slow">${bars}</div>
+      </div>` + hintStep(eq(q.whole, "−", q.part, ans));
+  }
+
+  if (q.model === "comparison") {
+    const gap = q.a - q.b;
+    const bars = line(q.label_a, bar(q.a, "part-a", q.a))
+               + line(q.label_b, bar(q.b, "part-b", q.b) + bar("?", "unknown", Math.max(1, gap)));
+    return head + storyStep + `
+      <div class="chalk-step" data-speak="Line the two bars up. The extra bit sticking out is the difference.">
+        <div class="chalk-bars chalk-write-slow">${bars}</div>
+      </div>` + hintStep(eq(q.a, "−", q.b, ans));
+  }
+
+  if (q.model === "two_step") {
+    // Running total along an arrow row: 7 →+5→ 12 →−3→ 9
+    let running = q.start;
+    let arrows = `<span class="chalk-arrow-num">${running}</span>`;
+    let spoken = `We start with ${running}.`;
+    q.steps.forEach(([op, n], i) => {
+      running = op === "+" ? running + n : running - n;
+      const isLast = i === q.steps.length - 1;
+      arrows += `<span class="chalk-arrow-label"><span class="arrow-line">→</span><span class="chalk-green">${op}${n}</span></span>`
+              + `<span class="chalk-arrow-num ${isLast ? "unknown" : ""}">${running}</span>`;
+      spoken += ` Then ${op === "+" ? "add" : "take away"} ${n}, that makes ${running}.`;
+    });
+    return head + storyStep + `
+      <div class="chalk-step" data-speak="${esc(spoken)}">
+        <div class="chalk-arrow-row chalk-write-slow">${arrows}</div>
+      </div>` + hintStep("");
+  }
+
+  return head + storyStep + hintStep(`<div class="chalk-big-num chalk-write">${ans}</div>`);
+}
+
+// ── Missing number tutorial ─────────────────────────────────────────────
+// A missing part is a number bond with a hole in it; a balance is two pans
+// that must weigh the same.
+function buildTutorialMissingNumber(q) {
+  const ans = q.answer;
+  const arms = `
+    <svg class="chalk-bond-arms-svg" width="140" height="40" viewBox="0 0 140 40">
+      <line class="chalk-svg-line" x1="50" y1="4" x2="20" y2="36" stroke="rgba(255,255,255,.5)" stroke-width="2.5"/>
+      <line class="chalk-svg-line" x1="90" y1="4" x2="120" y2="36" stroke="rgba(255,255,255,.5)" stroke-width="2.5" style="animation-delay:.3s"/>
+    </svg>`;
+  const bond = (top, left, right) => `
+    <div class="chalk-bond">
+      <div class="chalk-bond-circle top">${top}</div>
+      ${arms}
+      <div style="display:flex;justify-content:center;gap:40px">
+        <div class="chalk-bond-circle bottom">${left}</div>
+        <div class="chalk-bond-circle bottom">${right}</div>
+      </div>
+    </div>`;
+  const head = `
+    <div class="chalk-title chalk-text">${withBlank(q.display, "chalk-blank")}</div>
+    <div class="chalk-line" style="width:60%"></div>`;
+  const answerStep = `
+    <div class="chalk-step" data-speak="So the box is ${ans}!">
+      <div class="chalk-big-num chalk-write">${ans}</div>
+      <div style="font-size:44px">🎉</div>
+    </div>`;
+
+  if (q.method === "bond") {
+    return head + `
+      <div class="chalk-step" data-speak="The whole is ${q.whole}. One part is ${q.known}. Which part is hiding?">
+        ${bond(q.whole, q.known, "❓")}
+      </div>
+      <div class="chalk-step" data-speak="${esc(q.hint)}">
+        <div class="chalk-text" style="font-size:19px;line-height:1.4">${esc(q.hint)}</div>
+        ${bond(q.whole, q.known, ans)}
+      </div>` + answerStep;
+  }
+
+  if (q.method === "inverse_whole") {
+    const [p1, p2] = q.parts;
+    return head + `
+      <div class="chalk-step" data-speak="Here the WHOLE is hiding, and we know both parts: ${p1} and ${p2}.">
+        ${bond("❓", p1, p2)}
+      </div>
+      <div class="chalk-step" data-speak="${esc(q.hint)}">
+        <div class="chalk-text" style="font-size:19px;line-height:1.4">${esc(q.hint)}</div>
+        <div class="chalk-equation chalk-write"><span>${p1}</span> <span class="chalk-op">+</span> <span>${p2}</span> <span class="chalk-op">=</span> <span class="chalk-ans">${ans}</span></div>
+      </div>` + answerStep;
+  }
+
+  if (q.method === "balance") {
+    const total = q.left_a + q.left_b;
+    const pans = (rightVal, cls) => `
+      <div class="chalk-balance">
+        <div class="chalk-pan ${cls}">${q.left_a} + ${q.left_b}</div>
+        <span class="chalk-divider">=</span>
+        <div class="chalk-pan ${cls}">${q.right_known} + ${rightVal}</div>
+      </div>`;
+    return head + `
+      <div class="chalk-step" data-speak="The equals sign means both sides weigh the same.">
+        <div style="font-size:44px">⚖️</div>
+        ${pans("❓", "")}
+      </div>
+      <div class="chalk-step" data-speak="This side is ${q.left_a} plus ${q.left_b}, which is ${total}. So the other side must also be ${total}.">
+        <div class="chalk-text chalk-yellow chalk-write" style="font-size:22px">${q.left_a} + ${q.left_b} = ${total}</div>
+        <div class="chalk-text" style="font-size:19px;line-height:1.4">${esc(q.hint)}</div>
+      </div>
+      <div class="chalk-step" data-speak="${q.right_known} plus ${ans} is ${total}. Balanced!">
+        ${pans(ans, "solved")}
+        <div style="font-size:44px">🎉</div>
+      </div>`;
+  }
+
+  return head + `
+    <div class="chalk-step" data-speak="${esc(q.hint)}">
+      <div class="chalk-text" style="font-size:19px">${esc(q.hint)}</div>
+    </div>` + answerStep;
 }
 
 // ── Pattern tutorial builders (visual + speech + chalk-write) ────────
@@ -2766,7 +3100,7 @@ function buildTutorialPattern(q) {
     }
     const jumpEmoji = d > 0 ? "🐸" : "🦘";
     return `
-      <div class="chalk-title chalk-text chalk-write">${sign}${d} ${sign}${d} ${sign}${d}</div>
+      <div class="chalk-title chalk-text">${sign}${d} ${sign}${d} ${sign}${d}</div>
       <div class="chalk-line" style="width:60%"></div>
       <div class="chalk-step" data-speak="${seqStr}. See the pattern? We jump ${word} ${Math.abs(d)} every time!">
         <div class="chalk-arrow-row chalk-write-slow">${arrows}</div>
@@ -2841,6 +3175,9 @@ function buildTutorialPattern(q) {
     <div class="chalk-title chalk-text">🔢 ❓</div>
     <div class="chalk-line" style="width:60%"></div>
     <div class="chalk-step" data-speak="${seqStr}, what comes next?"><div class="chalk-arrow-row chalk-write-slow">${arrows}</div></div>
+    ${q.hint ? `<div class="chalk-step" data-speak="${esc(q.hint)}">
+      <div class="chalk-text chalk-yellow" style="font-size:20px;line-height:1.4">${esc(q.hint)}</div>
+    </div>` : ""}
     <div class="chalk-step" data-speak="It's ${ans}!">
       <div class="chalk-big-num chalk-write">${ans}</div>
       <div style="font-size:48px">🎉</div>
