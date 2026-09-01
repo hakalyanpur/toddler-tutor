@@ -75,7 +75,7 @@ that teach the method, not just the answer.
 
 ---
 
-## Numeracy (286 questions in `math.json`)
+## Numeracy (302 questions in `math.json`)
 
 | Topic | Count | Scope | Question Types |
 |---|---|---|---|
@@ -90,6 +90,7 @@ that teach the method, not just the answer.
 | Patterns | 54 | Skip counting (+1 through +6, +9, +10, +11), doubling and **halving**, countdown (−2, −3, −5, −10), sequences that cross a ten, plus a **structure tier**: growing jumps (+1, +2, +3…), triangular and square numbers, zig-zag (+2, −1), Fibonacci (add the last two), repeating blocks (1, 2, 3, 1, 2, 3…) and interleaved pairs (1, 10, 2, 20…) | `pattern` |
 | Word problems (bar model) | 22 | **Singapore bar-model stories**: part-whole, missing part, comparison ("how many *more*"), and two-step (win 5, give 3 away) | `word_problem` |
 | Missing number | 18 | **Algebraic thinking**: missing addend (7 + ⬜ = 10), missing whole (⬜ − 3 = 6), and **equation balance** (4 + 3 = 5 + ⬜) | `missing_number` |
+| Place value (tens & bundles) | 16 | **Unitizing**: ten loose straws become one bundle, and back again. Bundles are drawn as ten visible sticks under a tie, never as a pre-formed block, so ten-as-one is something to see rather than accept. `pv11` (1 bundle + 12 loose) is carrying, before any column | `place_value` |
 | Number riddles | 16 | **Deduction over numbers**: multi-clue constraints ("bigger than 5, even, NOT 8"), place value, inverse relations, "which number does a 2-jump frog never land on" | `number_riddle` |
 | Shapes | 20 | 2D (triangle, circle, square, rectangle, oval, diamond) + 3D (sphere, cube, cylinder, cone) | `shape` |
 | Number ordering | 8 | Before/after/between numbers 1–20 | `number_order` |
@@ -134,6 +135,32 @@ All two-digit problems are **no-regrouping** (the ones column never exceeds 9), 
 5. **2-digit + 2-digit, with regrouping** (e.g. 27 + 15, 48 + 39) — `carry`: the written column algorithm *with carrying*. Builds directly on step 3's no-carry column — the only new idea is that when the ones sum exceeds 9, you write the ones digit and carry 1 ten into the tens column.
 
 > **Pedagogical note:** Singapore math deliberately teaches mental calculation (number bonds, make-ten, decompose into tens & ones) *before* and *as the basis for* the standard column algorithm. The two-digit explainer mirrors this: head first, paper second.
+
+---
+
+### Level progression (how math is served)
+
+`math.json` spans preschool to P2, so serving it flat meant a session could mix
+"which is bigger, 3 or 5?" with `48 − 25`. Every question now carries a `level`
+and a `strand`, and the Math button opens a level picker, mirroring how Words is
+served as reading tiers.
+
+| Level | Name | Contents | Count |
+|---|---|---|---|
+| 1 | Counting & Comparing | more/less, sorting, positional, 2D shapes, small comparisons | 58 |
+| 2 | Facts to 20 | count on, make ten, doubles, bonds, constant-step patterns, number order | 102 |
+| 3 | Structure & Stories | structure patterns, missing number, word problems, riddles, 3D shapes | 83 |
+| 4 | Tens & Bundles | place value, split tens, add tens, near-10 | 39 |
+| 5 | On Paper | column method, carrying, 2-digit subtraction | 20 |
+
+**Level 4 sits deliberately below level 5.** Carrying is meaningless without
+ten-as-a-unit: the whole move is "ten ones become one ten". A child who has the
+column algorithm but not the bundle is performing a ritual. The ordering puts
+that in the data rather than leaving it to memory.
+
+`strand` (number, operations, patterns, reasoning, shapes, measures) is the
+second axis, for topic selection and per-strand progress. `GET /api/questions/math`
+accepts `?level=` and `?strand=`, both optional; with neither, it behaves as before.
 
 ---
 

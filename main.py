@@ -83,9 +83,21 @@ def _pick_questions(pool, mode, player_name, count=5):
     return result[:count]
 
 # ── question endpoints ────────────────────────────────────────────────────────
+# Math is served as a level progression (see questions/syllabus.md for the
+# curriculum placement each level maps to). Level 4 (tens & place value) sits
+# deliberately below level 5 (written algorithms): carrying is meaningless
+# until ten-as-a-unit is real.
 @app.get("/api/questions/math")
-def get_math_questions(player_name: str = Query("")):
-    return _pick_questions(MATH_Q, "math", player_name)
+def get_math_questions(player_name: str = Query(""),
+                       level: int = Query(None),
+                       strand: str = Query(None)):
+    pool = MATH_Q
+    if level is not None:
+        pool = [q for q in pool if q.get("level") == level]
+    if strand is not None:
+        pool = [q for q in pool if q.get("strand") == strand]
+
+    return _pick_questions(pool, "math", player_name)
 
 @app.get("/api/questions/logic")
 def get_logic_questions(player_name: str = Query("")):

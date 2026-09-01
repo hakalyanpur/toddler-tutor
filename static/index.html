@@ -515,6 +515,24 @@
       rgba(255,200,100,.6) 4px);
     box-shadow: 0 0 3px rgba(255,200,100,.2);
   }
+  /* bundled straws for place value: a bundle is visibly ten sticks tied up,
+     never a pre-formed block, so ten-as-one is something the child can see */
+  .straws { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: center;
+            gap: 14px; margin: 12px 0; }
+  .bundle, .loose { display: flex; gap: 2px; position: relative; padding: 4px 3px; }
+  .stick { width: 4px; height: 42px; border-radius: 2px; background: #d9a441;
+           box-shadow: inset -1px 0 0 rgba(0,0,0,.15); }
+  .bundle { border-radius: 4px; }
+  .bundle::after {
+    content: ""; position: absolute; left: -2px; right: -2px; top: 50%;
+    height: 6px; transform: translateY(-50%); border-radius: 3px;
+    background: #c2410c; box-shadow: 0 1px 0 rgba(0,0,0,.2);
+  }
+  .straw-caption { font-size: 13px; color: var(--text-sub); font-weight: 700; text-align: center; }
+  /* chalkboard variant */
+  .chalkboard .stick { background: rgba(255,235,120,.85); box-shadow: none; }
+  .chalkboard .bundle::after { background: rgba(255,120,120,.9); }
+  .chalkboard .straw-caption { color: rgba(255,255,255,.7); }
   /* the ⬜ placeholder in a missing-number equation, drawn instead of typeset */
   .blank-box {
     display: inline-block; width: 30px; height: 30px; vertical-align: -5px;
@@ -686,7 +704,7 @@
   <h1 class="title" id="helloName">Hi Avyaan!</h1>
   <p class="sub">What would you like to learn?</p>
   <div class="row">
-    <button class="btn-mode btn-math" onclick="startMode('math')">
+    <button class="btn-mode btn-math" onclick="showMathLevels()">
       <span class="icon">🍎</span> Math
     </button>
     <button class="btn-mode btn-verbal" onclick="showWordTiers()">
@@ -703,6 +721,14 @@
   <h1 class="title">📖 Learn to Read</h1>
   <p class="sub">Start at the bottom and climb! 🪜</p>
   <div class="tier-list" id="tierList"></div>
+  <button class="btn-skip mt" onclick="goHome()">← Back</button>
+</div>
+
+<!-- ── SCREEN: math levels ── -->
+<div class="card hidden" id="screenLevels">
+  <h1 class="title">🍎 Math</h1>
+  <p class="sub">Pick a rung and climb! 🪜</p>
+  <div class="tier-list" id="levelList"></div>
   <button class="btn-skip mt" onclick="goHome()">← Back</button>
 </div>
 
@@ -786,7 +812,7 @@ let _sio = null;               // state for the sound-it-out (double reading) ga
 
 // ── screens ────────────────────────────────────────────────────────────────
 function show(id) {
-  ["screenName","screenHome","screenTiers","screenQuiz","screenBoard"].forEach(s=>
+  ["screenName","screenHome","screenTiers","screenLevels","screenQuiz","screenBoard"].forEach(s=>
     document.getElementById(s).classList.add("hidden")
   );
   document.getElementById(id).classList.remove("hidden");
@@ -809,6 +835,31 @@ const READING_TIERS = [
   { tier: 0, icon: "🌱", name: "Warm-Up",          blurb: "Sounds, colours and opposites." },
 ];
 
+// ── math levels ────────────────────────────────────────────────────────────
+// Ordered by the Singapore progression, not by topic: facts before structure,
+// and place value before the written algorithms that depend on it.
+const MATH_LEVELS = [
+  { level: 1, icon: "🔢", name: "Counting & Comparing", blurb: "More or less, sorting, shapes and where things are." },
+  { level: 2, icon: "➕", name: "Facts to 20",          blurb: "Count on, make ten, doubles and number bonds." },
+  { level: 3, icon: "🧠", name: "Structure & Stories",  blurb: "Patterns, missing numbers, word problems and riddles." },
+  { level: 4, icon: "🔟", name: "Tens & Bundles",       blurb: "Ten ones make one ten, the idea behind big numbers." },
+  { level: 5, icon: "📝", name: "On Paper",             blurb: "Stacking numbers up and carrying the ten." },
+];
+
+function showMathLevels() {
+  document.getElementById("levelList").innerHTML = MATH_LEVELS.map(l => `
+    <button class="tier-card" onclick="startMode('math', ${l.level})">
+      <span class="tier-icon">${l.icon}</span>
+      <span class="tier-body">
+        <span class="tier-name">Level ${l.level} · ${l.name}</span>
+        <span class="tier-blurb">${l.blurb}</span>
+      </span>
+    </button>`).join("");
+  document.getElementById("backBtn").classList.add("hidden");
+  document.getElementById("scoreBar").classList.add("hidden");
+  show("screenLevels");
+}
+
 function showWordTiers() {
   document.getElementById("tierList").innerHTML = READING_TIERS.map(t => `
     <button class="tier-card" onclick="startMode('verbal', ${t.tier})">
@@ -826,7 +877,10 @@ function showWordTiers() {
 // ── name is hardcoded ──────────────────────────────────────────────────────
 
 // ── start mode ─────────────────────────────────────────────────────────────
-async function startMode(mode, tier) {
+// Words climb tiers, math climbs levels: same idea, different query param.
+const TRACK_PARAM = { verbal: "tier", math: "level" };
+
+async function startMode(mode, track) {
   sessionCorrect = 0; sessionTotal = 0; streak = 0; qIndex = 0; wrongCount = 0;
   sessionStartTime = Date.now(); questionResults = [];
   updateScoreBar();
@@ -835,11 +889,11 @@ async function startMode(mode, tier) {
   document.getElementById("scoreBar").classList.remove("hidden");
   show("screenQuiz");
   let url = `/api/questions/${mode}?player_name=${encodeURIComponent(playerName)}`;
-  if (tier !== undefined) url += `&tier=${tier}`;
+  if (track !== undefined) url += `&${TRACK_PARAM[mode]}=${track}`;
   const res = await fetch(url);
   questions = await res.json();
   questions._mode = mode;
-  questions._tier = tier;
+  questions._track = track;
   renderQuestion();
 }
 
@@ -856,6 +910,23 @@ function esc(s) {
   const d = document.createElement("div");
   d.textContent = s;
   return d.innerHTML;
+}
+
+// Draws `tens` tied bundles and `ones` loose sticks. Ones beyond nine stay
+// loose on purpose: seeing ten loose sticks is what makes bundling them obvious.
+const STICKS_PER_BUNDLE = 10;
+
+function drawStraws(tens, ones) {
+  const stick = `<span class="stick"></span>`;
+  const bundle = `<span class="bundle">${stick.repeat(STICKS_PER_BUNDLE)}</span>`;
+  const groups = bundle.repeat(tens || 0) + (ones ? `<span class="loose">${stick.repeat(ones)}</span>` : "");
+  if (!groups) return "";
+
+  const parts = [];
+  if (tens)  parts.push(`${tens} bundle${tens > 1 ? "s" : ""}`);
+  if (ones)  parts.push(`${ones} loose`);
+  return `<div class="straws">${groups}</div>
+          <div class="straw-caption">${parts.join(" and ")}</div>`;
 }
 
 // Renders a "7 + ⬜ = 10" display, swapping the placeholder for a drawn box.
@@ -992,6 +1063,15 @@ function renderQuestion() {
       <p class="q-text">What fits in the box? 🧠</p>
       <p style="font-size:34px;margin:12px 0;font-family:'Fredoka One',cursive;color:var(--accent)">${withBlank(q.display, "blank-box")}</p>
       <div class="opt-row">${makeArithOpts(q.answer, q.id)}</div>`;
+
+  } else if(q.type === "place_value") {
+    currentCorrect = String(q.answer);
+    area.innerHTML = `
+      ${drawStraws(q.tens, q.ones)}
+      <p class="q-text" style="font-size:19px;line-height:1.5;max-width:420px;margin:0 auto">${esc(q.question)}</p>
+      <div class="opt-row">${q.options.map(o=>
+        `<button class="btn-answer" onclick="checkAnswer('${esc(String(o))}','${esc(String(q.answer))}','${q.id}')" style="font-size:22px;padding:14px 20px">${esc(String(o))}</button>`
+      ).join("")}</div>`;
 
   } else if(q.type === "number_riddle") {
     currentCorrect = String(q.answer);
@@ -1393,7 +1473,7 @@ function showSummary() {
   const pct = sessionTotal ? Math.round((sessionCorrect/sessionTotal)*100) : 0;
   const totalMs = Date.now() - sessionStartTime;
   const mode = questions._mode;
-  const tier = questions._tier;
+  const track = questions._track;
   const modeLabel = mode === "math" ? "🍎 Math" : mode === "logic" ? "🧩 Logic" : "📖 Words";
   const avgMs = sessionTotal ? Math.round(totalMs / sessionTotal) : 0;
 
@@ -1404,7 +1484,8 @@ function showSummary() {
   // Per-question results table
   const resultRows = questionResults.map((r, i) => {
     const icon = r.correct ? "✅" : "❌";
-    const label = r.question.length > 20 ? r.question.slice(0, 18) + "…" : r.question;
+    const text = r.question.split("⬜").join("?");
+    const label = text.length > 20 ? text.slice(0, 18) + "…" : text;
     return `<tr>
       <td style="font-size:16px">${i+1}</td>
       <td style="font-size:16px;text-align:left">${esc(label)}</td>
@@ -1443,7 +1524,7 @@ function showSummary() {
     </table>
 
     <div class="mt row">
-      <button class="btn-primary" onclick="${tier !== undefined ? `startMode('${mode}', ${tier})` : `startMode('${mode}')`}">Play again 🔄</button>
+      <button class="btn-primary" onclick="${track !== undefined ? `startMode('${mode}', ${track})` : `startMode('${mode}')`}">Play again 🔄</button>
       ${mode === "verbal" ? `<button class="btn-primary" style="background:linear-gradient(135deg,#5eead4,#2dd4bf);color:#0f3b36" onclick="showWordTiers()">More tiers 🪜</button>` : ""}
       <button class="btn-primary" style="background:linear-gradient(135deg,#43e97b,#38f9d7);color:#065f46" onclick="goHome()">Home 🏠</button>
     </div>`;
@@ -1639,6 +1720,7 @@ const tutorialBuilders = {
   word_problem: buildTutorialWordProblem,
   missing_number: buildTutorialMissingNumber,
   number_riddle: buildTutorialLogic,
+  place_value: buildTutorialPlaceValue,
   phonics: buildTutorialPhonics,
   digraph: buildTutorialDigraph,
   spelling: buildTutorialSpelling,
@@ -2974,6 +3056,38 @@ function buildTutorialWordProblem(q) {
   }
 
   return head + storyStep + hintStep(`<div class="chalk-big-num chalk-write">${ans}</div>`);
+}
+
+// ── Place value tutorial ────────────────────────────────────────────────
+// Counts the bundles by tens, then adds the loose ones. Never asserts that a
+// bundle "is" ten: it shows the ten sticks inside it.
+function buildTutorialPlaceValue(q) {
+  const tens = q.tens || 0, ones = q.ones || 0;
+  const tensValue = tens * STICKS_PER_BUNDLE;
+  const countByTens = Array.from({length: tens}, (_, i) => (i + 1) * STICKS_PER_BUNDLE).join(", ");
+
+  const head = `
+    <div class="chalk-title chalk-text">🥢 🔟</div>
+    <div class="chalk-line" style="width:60%"></div>
+    <div class="chalk-step" data-speak="${esc(q.question)}">
+      <div class="chalk-text" style="font-size:19px;line-height:1.45">${esc(q.question)}</div>
+      ${drawStraws(tens, ones)}
+    </div>`;
+
+  const countStep = tens ? `
+    <div class="chalk-step" data-speak="Count the bundles in tens. ${countByTens}.">
+      <div class="chalk-text chalk-write" style="font-size:24px;color:rgba(120,200,255,.95)">${countByTens || tensValue}</div>
+      <div class="chalk-text chalk-yellow" style="font-size:18px">${tens} bundle${tens > 1 ? "s" : ""} = ${tensValue}</div>
+    </div>` : "";
+
+  return head + countStep + `
+    <div class="chalk-step" data-speak="${esc(q.hint)}">
+      <div class="chalk-text" style="font-size:19px;line-height:1.4">${esc(q.hint)}</div>
+    </div>
+    <div class="chalk-step" data-speak="So the answer is ${esc(String(q.answer))}!">
+      <div class="chalk-big-num chalk-write">${esc(String(q.answer))}</div>
+      <div style="font-size:44px">🎉</div>
+    </div>`;
 }
 
 // ── Missing number tutorial ─────────────────────────────────────────────
