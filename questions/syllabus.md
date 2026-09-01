@@ -11,13 +11,67 @@
 
 ## Framework Context
 
-Based on the MOE **Nurturing Early Learners (NEL)** framework and curriculum standards
-from top Singapore preschools (MindChamps, Mulberry Learning, EtonHouse, MOE Kindergartens).
-Questions target the **upper end** of N2/K1 expectations — what the best students excel at.
+Two official documents define the ladder. Both were read directly; the placement
+table below cites their own numbering.
+
+- **[NEL Framework 2022 / Educators' Guide for Numeracy](https://isomer-user-content.by.gov.sg/57/c079b912-2898-42e2-b32d-ff3ab7cfbec4/Nurturing%20Early%20Learners%202022%20Educators%20Guide%20Numeracy_new.pdf)** — the preschool band, ages 4–6 (N2 through K2).
+- **[MOE 2021 Primary Mathematics Syllabus P1–P6](https://www.moe.gov.sg/api/media/92bff26d-b2b4-4535-b868-b8415c744b91/2021-Primary-Mathematics-Syllabus-P1-to-P6-Updated-October-2025.pdf)** (updated Oct 2025) — P1 onwards, ages 6–7 and up.
+
+### What the preschool band actually asks for
+
+NEL's numeracy learning goals cap out well below this app. Verbatim:
+
+- LG 3.1 "Rote count to at least 20"; 3.2 "Count reliably to at least 10 things"
+- LG 3.7 compare two sets "of up to 10 things each" using same as / more than / fewer than
+- LG 3.8 "Name the parts that form the whole in a quantity of up to 10 (e.g., 5 is made up of 2 and 3, and 1 and 4)" — number bonds within 10, the ceiling of preschool arithmetic
+- LG 2.3 "Recognise, extend and create patterns (e.g., ABABAB, ABCABCABC)" — repeats only, no number sequences
+- LG 4.1 the four basic shapes: circle, square, rectangle, triangle
+
+There is **no symbolic addition or subtraction anywhere in the preschool goals**. The
+guide frames part-whole work as preparation "with addition and subtraction in their
+future learning."
+
+So: only the `more_less`, `sorting`, `positional`, some `bigger`, and the bonds-within-10
+items sit inside the Singapore preschool band. **Everything else in `math.json` is
+Primary-1 content or above** — deliberately, but it should be called what it is. The
+"top-tier N2/K1" title is aspiration, not placement.
 
 Approach follows Singapore's **Concrete → Pictorial → Abstract (CPA)** method:
 emoji visuals (pictorial) paired with number/word choices (abstract), with strategy hints
 that teach the method, not just the answer.
+
+### Curriculum placement (against the MOE content lists)
+
+| App content | Level | Syllabus reference |
+|---|---|---|
+| Bonds within 10, compare sets to 10, ABAB patterns, 4 basic shapes | Preschool | NEL LG 2.3, 3.7, 3.8, 4.1 |
+| Numbers to 100, place value, comparing/ordering | P1 (6–7) | P1 Whole Numbers 1.1–1.5 |
+| `pattern` (number sequences) | P1 → P4 | "patterns in number sequences": P1 1.6, P2 1.5, P3 1.5, P4 1.4 |
+| `missing_number` (inverse, missing addend) | P1 | Add/Sub 2.3 "relationship between addition and subtraction" |
+| `missing_number` (balance, `4 + 3 = 5 + ⬜`) | P1 topic, Big Idea | Add/Sub 2.2 "use of +, – and ="; syllabus Big Ideas → Equivalence |
+| Three addends (`a25`–`a30`) | P1 | Add/Sub 2.4 "adding more than two 1-digit numbers" |
+| 2-digit addition and subtraction, incl. carrying | P1 | Add/Sub 2.5 "adding and subtracting within 100" + 2.6 "using algorithms" |
+| `split_tens`, `near_10`, mental strategies | P1 | Add/Sub 2.7 (within 20; 2-digit and ones without renaming; 2-digit and tens) |
+| Odd/even reasoning (`nr13`, logic `oo4`) | P2 (7–8) | P2 Whole Numbers 1.6 "odd and even numbers" |
+| 3D shapes (cube, cylinder, cone) | P2 | P2 Geometry 2.1 (cube, cuboid, cone, cylinder) |
+| `time` (parts of the day) | below P1 | P1 Time 2.1 is "telling time to 5 minutes" — the app is easier, not harder |
+
+### Deviations, deliberate and otherwise
+
+- **Bar models are not in the MOE content lists at all.** They are pedagogy carried by
+  the textbooks, not syllabus items, so no level can be cited for part-whole vs
+  comparison vs two-step. The progression used here (part-whole first, comparison
+  later, two-step last) follows textbook practice, not a sourced MOE ordering.
+- **Money uses US coins**, not the syllabus's cents-to-$1 and dollars-to-$100. Deliberate.
+- **Shapes**: `oval` and `diamond` are not MOE shapes at any level, and P1's list
+  includes half circle and quarter circle, which the app lacks. `sphere` is not in the
+  P2 3D list (cube, cuboid, cone, cylinder).
+- **Named sequence structures** — triangular, square, Fibonacci, interleaved — are not
+  spelled out anywhere in P1–P4. They sit under the "patterns in number sequences"
+  heading in spirit, at its enrichment end. Treat them as olympiad-flavoured, not
+  curriculum.
+- **P1 also contains multiplication within 40 and division within 20**, which this app
+  does not cover at all.
 
 ---
 
@@ -198,4 +252,5 @@ the parent voices it (Hoel's parent-led 1:1 model).
 - **Regrouping into the hundreds** — written carry is now covered for 2-digit + 2-digit sums *within 100* (the `carry` set, e.g. 27 + 15, 48 + 39). Still not covered: sums that cross 100 (e.g. 68 + 57), and subtraction with regrouping (borrowing)
 - **Multiplication foundations** — groups of (2 groups of 3)
 - **Three-step word problems** and bar models with unequal parts (fractions of a bar)
-- **Analog clock** — telling time to the hour
+- **Analog clock** — P1 expects telling time to 5 minutes (P1 Time 2.1); the app only covers parts of the day
+- **Multiplication and division** — both are P1 content in the 2021 syllabus (within 40 and within 20 respectively), entirely absent here
